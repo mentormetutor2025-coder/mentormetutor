@@ -46,6 +46,8 @@
   .nav-links { display: flex; gap: 28px; list-style: none; }
   .nav-links a { color: rgba(255,255,255,.82); text-decoration: none; font-size: .88rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; transition: color .2s; }
   .nav-links a:hover { color: var(--orange); }
+  .nav-ws { color: #27ae60 !important; border: 1.5px solid rgba(39,174,96,.45); border-radius: 50px; padding: 5px 14px !important; transition: background .2s, color .2s !important; }
+  .nav-ws:hover { background: #27ae60 !important; color: #fff !important; }
   .nav-assess { color: var(--orange) !important; border: 1.5px solid rgba(240,124,30,.45); border-radius: 50px; padding: 5px 14px !important; transition: background .2s, color .2s !important; }
   .nav-assess:hover { background: var(--orange) !important; color: #fff !important; }
   .nav-donate { color: #e74c3c !important; border: 1.5px solid rgba(231,76,60,.45); border-radius: 50px; padding: 5px 14px !important; transition: background .2s, color .2s !important; }
@@ -372,7 +374,8 @@
   <a href="#schedule" onclick="closeMobile()">Schedule</a>
   <a href="#pricing" onclick="closeMobile()">Fees</a>
   <a href="#contact" onclick="closeMobile()">Contact</a>
-  <a href="assessments.html" style="color:var(--orange);font-weight:700;">&#128203; Assessments</a>
+  <a href="worksheets.html" style="color:#27ae60;font-weight:700;"><a href="assessments.html" style="color:var(--orange);font-weight:700;">&#128203; Assessments</a>#128196; Worksheets</a>
+  <a href="assessments.html" style="color:var(--orange);font-weight:700;"><a href="assessments.html" style="color:var(--orange);font-weight:700;">&#128203; Assessments</a>#128203; Assessments</a>
   <a href="#donate" onclick="closeMobile()" style="color:#e74c3c;font-weight:700;">&#10084; Donate</a>
 </div>
 
@@ -388,7 +391,8 @@
     <li><a href="#schedule">Schedule</a></li>
     <li><a href="#pricing">Fees</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="assessments.html" class="nav-assess">&#128203; Assessments</a></li>
+    <li><a href="worksheets.html" class="nav-ws"><li><a href="assessments.html" class="nav-assess">&#128203; Assessments</a></li>#128196; Worksheets</a></li>
+    <li><a href="assessments.html" class="nav-assess"><li><a href="assessments.html" class="nav-assess">&#128203; Assessments</a></li>#128203; Assessments</a></li>
     <li><a href="#donate" class="nav-donate">&#10084; Donate</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Enrol Now</a>
