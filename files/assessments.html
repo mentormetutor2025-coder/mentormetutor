@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Diagnostic Assessments | Mentor Me Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#1a2e45;--teal:#2d6a8f;--orange:#f07c1e;--cream:#fdf8f2;--white:#fff;--text:#2c2c2c;--muted:#7a8a99;--green:#27ae60;--red:#e74c3c;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(26,46,69,.97);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:64px;box-shadow:0 2px 20px rgba(0,0,0,.25);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo img{height:38px;border-radius:8px;}
+.nav-logo span{color:#fff;font-family:"Playfair Display",serif;font-size:1.05rem;}
+.nav-back{color:rgba(255,255,255,.75);text-decoration:none;font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:6px;transition:color .2s;}
+.nav-back:hover{color:var(--orange);}
+.hero{background:linear-gradient(135deg,var(--navy),#14233a);padding:100px 5vw 60px;text-align:center;}
+.hero-inner{max-width:700px;margin:0 auto;}
+.hero-label{font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;}
+.hero h1{font-family:"Playfair Display",serif;font-size:clamp(1.8rem,3.5vw,3rem);color:#fff;margin-bottom:16px;line-height:1.15;}
+.hero p{color:rgba(255,255,255,.65);font-size:1rem;margin:0 auto 28px;line-height:1.7;}
+.caps-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:8px 20px;color:rgba(255,255,255,.7);font-size:.8rem;}
+.tabs-wrap{background:var(--white);border-bottom:2px solid #edf0f4;position:sticky;top:64px;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.tabs{display:flex;max-width:900px;margin:0 auto;overflow-x:auto;}
+.tab-btn{flex:1;min-width:160px;padding:18px 12px;border:none;background:none;font-family:"DM Sans",sans-serif;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer;transition:color .2s;border-bottom:3px solid transparent;text-align:center;white-space:nowrap;}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange);}
+.tab-btn:hover:not(.active){color:var(--navy);}
+.level-panel{display:none;max-width:960px;margin:0 auto;padding:48px 5vw 80px;}
+.level-panel.active{display:block;}
+.subject-tabs{display:flex;gap:10px;margin-bottom:36px;flex-wrap:wrap;}
+.subj-btn{padding:9px 22px;border-radius:50px;border:2px solid #e2e8f0;background:none;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;}
+.subj-btn.s-en{background:var(--teal);border-color:var(--teal);color:#fff;}
+.subj-btn.s-math{background:var(--orange);border-color:var(--orange);color:#fff;}
+.subj-btn.s-zu{background:var(--navy);border-color:var(--navy);color:#fff;}
+.subj-panel{display:none;}
+.subj-panel.active{display:block;}
+.assess-header{background:linear-gradient(135deg,var(--navy),#1d3a58);border-radius:20px;padding:32px 36px;margin-bottom:32px;color:#fff;}
+.assess-header h2{font-family:"Playfair Display",serif;font-size:1.6rem;margin-bottom:8px;}
+.assess-header p{color:rgba(255,255,255,.65);font-size:.92rem;line-height:1.6;}
+.assess-meta{display:flex;gap:16px;margin-top:18px;flex-wrap:wrap;}
+.meta-chip{background:rgba(255,255,255,.1);border-radius:50px;padding:5px 14px;font-size:.78rem;color:rgba(255,255,255,.8);}
+.instructions{background:#fff8ec;border-left:4px solid var(--orange);border-radius:0 12px 12px 0;padding:18px 22px;margin-bottom:32px;}
+.instructions strong{color:var(--orange);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px;}
+.instructions p{font-size:.92rem;color:#5a4a3a;line-height:1.6;}
+.passage{background:var(--white);border:1px solid #e8ecf0;border-radius:14px;padding:24px 28px;margin-bottom:28px;}
+.passage-label{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.passage p{font-size:.95rem;line-height:1.8;color:#3a4a5a;font-style:italic;}
+.section-title{font-family:"Playfair Display",serif;font-size:1.2rem;color:var(--navy);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:"";flex:1;height:1px;background:#e2e8f0;}
+.question{background:var(--white);border-radius:14px;padding:22px 24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid #edf0f4;transition:border-color .2s;}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--orange);color:#fff;border-radius:50%;font-size:.78rem;font-weight:700;margin-right:10px;flex-shrink:0;}
+.q-text{font-size:.96rem;line-height:1.6;color:var(--text);display:flex;align-items:flex-start;}
+.q-marks{margin-left:auto;padding-left:12px;font-size:.75rem;color:var(--muted);font-weight:600;flex-shrink:0;}
+.options{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+.options li{display:flex;align-items:center;gap:10px;font-size:.9rem;color:#4a5568;padding:9px 14px;border-radius:8px;background:#f8fafc;border:1px solid #e8ecf0;cursor:pointer;transition:background .15s,border-color .2s;}
+.options li:hover{background:#eef5fb;border-color:#b8d0e8;}
+.options li input{accent-color:var(--teal);}
+.options li.opt-correct{background:#d4edda !important;border-color:#28a745 !important;font-weight:600;color:#155724;}
+.options li.opt-wrong{background:#f8d7da !important;border-color:#dc3545 !important;color:#721c24;}
+.options li.opt-missed{background:#fff3cd !important;border-color:#ffc107 !important;}
+.short-answer{margin-top:12px;}
+.short-answer input,.short-answer textarea{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:.9rem;color:var(--text);outline:none;transition:border-color .2s;background:#fafbfc;}
+.short-answer input:focus,.short-answer textarea:focus{border-color:var(--teal);}
+.short-answer textarea{min-height:80px;resize:vertical;}
+.model-answer{display:none;margin-top:12px;background:#eaf5fb;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:14px 18px;}
+.model-answer.show{display:block;}
+.model-answer-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:5px;}
+.model-answer p{font-size:.88rem;color:#2c5f7a;line-height:1.6;}
+/* RESULT BANNER */
+.result-banner{display:none;border-radius:18px;padding:28px 32px;margin-bottom:28px;border:2px solid transparent;}
+.result-banner.show{display:block;}
+.result-banner.r-excellent{background:linear-gradient(135deg,#d4edda,#c3e6cb);border-color:#28a745;}
+.result-banner.r-good{background:linear-gradient(135deg,#cce5ff,#b8daff);border-color:#004085;}
+.result-banner.r-satisfactory{background:linear-gradient(135deg,#fff3cd,#ffeeba);border-color:#ffc107;}
+.result-banner.r-needs-work{background:linear-gradient(135deg,#f8d7da,#f5c6cb);border-color:#dc3545;}
+.result-score{font-family:"Playfair Display",serif;font-size:2.8rem;font-weight:700;line-height:1;}
+.result-pct{font-size:1.1rem;font-weight:600;margin-top:4px;}
+.result-msg{font-size:.95rem;line-height:1.6;margin-top:10px;}
+.result-pending{font-size:.82rem;margin-top:10px;opacity:.8;font-style:italic;}
+.result-grid{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;}
+/* SUBMIT AREA */
+.submit-area{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.submit-btn{background:var(--green);color:#fff;border:none;padding:14px 34px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.96rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:8px;}
+.submit-btn:hover:not(:disabled){background:#1e9449;transform:translateY(-2px);}
+.submit-btn:disabled{background:#95a5a6;cursor:not-allowed;transform:none;}
+.reset-btn{display:none;background:var(--navy);color:#fff;border:none;padding:14px 28px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.reset-btn:hover{background:#253f5c;}
+.reset-btn.show{display:inline-flex;align-items:center;gap:8px;}
+.download-btn{display:none;background:var(--teal);color:#fff;border:none;padding:14px 28px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.download-btn:hover{background:#235a78;}
+.download-btn.show{display:inline-flex;align-items:center;gap:8px;}
+.csv-btn{display:none;background:#27ae60;color:#fff;border:none;padding:14px 28px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.csv-btn:hover{background:#1e9449;}
+.csv-btn.show{display:inline-flex;align-items:center;gap:8px;}
+/* MEMO */
+.memo-toggle{margin-top:24px;}
+.memo-btn{background:var(--navy);color:#fff;border:none;padding:13px 32px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.memo-btn:hover{background:#253f5c;}
+.memo-section{display:none;margin-top:28px;background:var(--white);border-radius:18px;padding:32px;border:2px solid #e2e8f0;}
+.memo-section.open{display:block;}
+.memo-section h3{font-family:"Playfair Display",serif;font-size:1.3rem;color:var(--navy);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #edf0f4;}
+.memo-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid #f0f4f8;}
+.memo-item:last-child{border-bottom:none;}
+.memo-q{width:32px;height:32px;min-width:32px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.78rem;font-weight:700;}
+.memo-ans{font-size:.9rem;color:#3a4a5a;line-height:1.6;}
+/* STUDENT INFO FORM */
+.student-form-wrap{max-width:700px;margin:40px auto 0;padding:0 5vw 48px;}
+.student-form-card{background:var(--white);border-radius:24px;padding:36px 40px;box-shadow:0 8px 40px rgba(0,0,0,.1);border:2px solid #edf0f4;}
+.student-form-card h2{font-family:"Playfair Display",serif;font-size:1.5rem;color:var(--navy);margin-bottom:8px;}
+.student-form-card p{color:var(--muted);font-size:.9rem;margin-bottom:28px;line-height:1.6;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+.form-group label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);}
+.form-group label span{color:var(--red);margin-left:2px;}
+.form-group input,.form-group select{padding:11px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.95rem;color:var(--text);outline:none;transition:border-color .2s;background:#fafbfc;}
+.form-group input:focus,.form-group select:focus{border-color:var(--teal);}
+.form-group input.error,.form-group select.error{border-color:var(--red);background:#fff5f5;}
+.form-error-msg{font-size:.78rem;color:var(--red);margin-top:4px;display:none;}
+.form-error-msg.show{display:block;}
+.start-btn{margin-top:28px;width:100%;padding:15px;background:var(--navy);color:#fff;border:none;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.start-btn:hover{background:#253f5c;transform:translateY(-2px);}
+.student-badge{display:none;max-width:960px;margin:24px auto 0;padding:0 5vw;}
+.student-badge-inner{background:linear-gradient(135deg,var(--navy),#1d3a58);border-radius:16px;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.student-badge-inner.show{display:flex;}
+.badge-info{display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.badge-chip{font-size:.85rem;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:6px;}
+.badge-chip strong{color:#fff;}
+.badge-edit{color:rgba(255,255,255,.6);font-size:.8rem;cursor:pointer;text-decoration:underline;border:none;background:none;font-family:"DM Sans",sans-serif;}
+.badge-edit:hover{color:#fff;}
+#assessment-content{display:none;}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr;}.student-form-card{padding:24px 20px;}}
+@media(max-width:640px){.assess-header{padding:24px 20px;}.question{padding:16px 18px;}.level-panel{padding:32px 4vw 60px;}.result-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo.png" alt="MMT Logo" onerror="this.style.display='none'"/>
+    <span>Mentor Me Tutor</span>
+  </a>
+  <a href="index.html" class="nav-back">&#8592; Back to Website</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Mentor Me Tutor</div>
+    <h1>Entry Level Diagnostic Assessments</h1>
+    <p>CAPS-aligned assessments to identify each learner's foundational strengths and gaps across English, Mathematics and isiZulu.</p>
+    <span class="caps-badge">&#128203; Aligned to South African CAPS &middot; Department of Basic Education</span>
+  </div>
+</div>
+
+<!-- STUDENT INFO FORM -->
+<div class="student-form-wrap" id="student-form-section">
+  <div class="student-form-card">
+    <h2>&#128100; Learner Details</h2>
+    <p>Please complete all fields below before starting your assessment. This information helps your tutor track your progress accurately.</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name <span>*</span></label>
+        <input type="text" id="std-firstname" placeholder="e.g. Sipho"/>
+        <div class="form-error-msg" id="err-firstname">Please enter your first name.</div>
+      </div>
+      <div class="form-group">
+        <label>Surname <span>*</span></label>
+        <input type="text" id="std-surname" placeholder="e.g. Dlamini"/>
+        <div class="form-error-msg" id="err-surname">Please enter your surname.</div>
+      </div>
+      <div class="form-group">
+        <label>Age <span>*</span></label>
+        <input type="number" id="std-age" placeholder="e.g. 13" min="8" max="20"/>
+        <div class="form-error-msg" id="err-age">Please enter a valid age (8–20).</div>
+      </div>
+      <div class="form-group">
+        <label>Current Grade <span>*</span></label>
+        <select id="std-grade">
+          <option value="">— Select Grade —</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+          <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+          <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+        </select>
+        <div class="form-error-msg" id="err-grade">Please select your current grade.</div>
+      </div>
+      <div class="form-group full">
+        <label>Current School Name <span>*</span></label>
+        <input type="text" id="std-school" placeholder="e.g. Umlazi Comprehensive High School"/>
+        <div class="form-error-msg" id="err-school">Please enter your school name.</div>
+      </div>
+    </div>
+    <button class="start-btn" onclick="startAssessment()">&#9654; Start My Assessment</button>
+  </div>
+</div>
+
+<!-- STUDENT BADGE (shown after form submitted) -->
+<div class="student-badge" id="student-badge">
+  <div class="student-badge-inner">
+    <div class="badge-info">
+      <div class="badge-chip">&#128100; <strong id="badge-name"></strong></div>
+      <div class="badge-chip">&#127891; <strong id="badge-grade"></strong></div>
+      <div class="badge-chip">&#127979; <strong id="badge-school"></strong></div>
+      <div class="badge-chip">&#128197; Age: <strong id="badge-age"></strong></div>
+    </div>
+    <button class="badge-edit" onclick="editDetails()">&#9998; Edit Details</button>
+  </div>
+</div>
+
+<!-- ASSESSMENT CONTENT -->
+<div id="assessment-content">
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showLevel('int',this)">Intermediate Phase<br/><small>Grades 4&#8211;7</small></button>
+    <button class="tab-btn" onclick="showLevel('sen',this)">Senior Phase<br/><small>Grades 8&#8211;9</small></button>
+    <button class="tab-btn" onclick="showLevel('fet',this)">FET Phase<br/><small>Grades 10&#8211;12</small></button>
+  </div>
+</div>
+
+<div class="level-panel active" id="panel-int">
+  <div class="subject-tabs">
+    <button class="subj-btn s-en" onclick="switchSubj('int','en',this)">&#128218; English</button>
+    <button class="subj-btn" onclick="switchSubj('int','math',this)">&#128290; Mathematics</button>
+    <button class="subj-btn" onclick="switchSubj('int','zu',this)">&#128483; isiZulu</button>
+  </div>
+
+  <!-- INT ENGLISH -->
+  <div class="subj-panel active" id="int-en">
+    <div class="assess-header">
+      <h2>English &#8212; Intermediate Phase</h2>
+      <p>Grades 4&#8211;7 &middot; Reading Comprehension, Vocabulary, Grammar &amp; Sentence Construction</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">30 Minutes</span><span class="meta-chip">20 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Read all questions carefully. Answer ALL questions. Read the passage before answering Questions 1&#8211;4. Write in full sentences where required.</p></div>
+    <div class="passage"><div class="passage-label">Read and answer Questions 1&#8211;4</div><p>Sipho woke up early on Saturday morning. He was excited because his class was going on a trip to the Durban aquarium. His teacher, Mrs Dlamini, told them to be at school by seven o'clock. Sipho quickly ate his breakfast, packed his lunch, and ran to meet his friend Thabo at the gate. When they arrived at the aquarium, they saw many colourful fish, a large shark, and a friendly dolphin that splashed water at the children. It was the best day of Sipho's life.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">1</span>Where did Sipho's class go on their trip?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie1" value="a"/> A. To a zoo</li>
+        <li><input type="radio" name="ie1" value="b"/> B. To the Durban aquarium</li>
+        <li><input type="radio" name="ie1" value="c"/> C. To a museum</li>
+        <li><input type="radio" name="ie1" value="d"/> D. To a park</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">2</span>What time did learners need to be at school?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie2" value="a"/> A. Six o'clock</li>
+        <li><input type="radio" name="ie2" value="b"/> B. Eight o'clock</li>
+        <li><input type="radio" name="ie2" value="c"/> C. Seven o'clock</li>
+        <li><input type="radio" name="ie2" value="d"/> D. Nine o'clock</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">3</span>Name TWO things Sipho did before leaving home.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your answer here..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Any TWO of: <strong>ate his breakfast</strong> / <strong>packed his lunch</strong> / <strong>ran to meet Thabo at the gate</strong>. (1 mark each)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">4</span>What does the word "excited" mean in the passage?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie4" value="a"/> A. Tired and bored</li>
+        <li><input type="radio" name="ie4" value="b"/> B. Sad and unhappy</li>
+        <li><input type="radio" name="ie4" value="c"/> C. Happy and looking forward to something</li>
+        <li><input type="radio" name="ie4" value="d"/> D. Angry and upset</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">5</span>Choose the correct punctuation: "where are you going ___"<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie5" value="a"/> A. .</li>
+        <li><input type="radio" name="ie5" value="b"/> B. ?</li>
+        <li><input type="radio" name="ie5" value="c"/> C. !</li>
+        <li><input type="radio" name="ie5" value="d"/> D. ,</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Identify the noun in: "The happy boy ran quickly."<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie6" value="a"/> A. happy</li>
+        <li><input type="radio" name="ie6" value="b"/> B. ran</li>
+        <li><input type="radio" name="ie6" value="c"/> C. boy</li>
+        <li><input type="radio" name="ie6" value="d"/> D. quickly</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">7</span>Choose the correct verb form: "She ___ to school every day."<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="ie7" value="a"/> A. walk</li>
+        <li><input type="radio" name="ie7" value="b"/> B. walks</li>
+        <li><input type="radio" name="ie7" value="c"/> C. walking</li>
+        <li><input type="radio" name="ie7" value="d"/> D. walked</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">8</span>Rewrite with a capital letter and correct punctuation: "the cat sat on the mat"<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Write the corrected sentence..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>The cat sat on the mat.</strong> (1 mark: capital T &bull; 1 mark: full stop)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">9</span>What is the antonym of the word "happy"?<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Your answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Accept: <strong>sad / unhappy / miserable</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">10</span>Write ONE sentence describing your favourite animal. Use an adjective.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your sentence here..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>E.g. <strong>"My dog has soft, brown fur."</strong> &mdash; (1 mark: correct sentence &bull; 1 mark: adjective used correctly)</p></div>
+    </div>
+
+    <div class="result-banner" id="res-int-en"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('int-en')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-int-en" onclick="resetAssessment('int-en')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-int-en" onclick="downloadResults('int-en')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-int-en" onclick="downloadCSV('int-en')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- INT MATHEMATICS -->
+  <div class="subj-panel" id="int-math">
+    <div class="assess-header">
+      <h2>Mathematics &#8212; Intermediate Phase</h2>
+      <p>Grades 4&#8211;7 &middot; Basic Operations, Fractions, Place Value &amp; Word Problems</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">30 Minutes</span><span class="meta-chip">20 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Answer ALL questions. Show ALL working where required. You may NOT use a calculator.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">1</span>What is the value of the digit 7 in the number 3745?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="im1" value="a"/> A. 7</li>
+        <li><input type="radio" name="im1" value="b"/> B. 70</li>
+        <li><input type="radio" name="im1" value="c"/> C. 700</li>
+        <li><input type="radio" name="im1" value="d"/> D. 7 000</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">2</span>Calculate: 456 + 278 =<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>734</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">3</span>Calculate: 502 &#8722; 167 =<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>335</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">4</span>Calculate: 24 &times; 6 =<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>144</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">5</span>Calculate: 84 &divide; 7 =<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>12</strong></p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Which fraction is the largest?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="im6" value="a"/> A. 1/4</li>
+        <li><input type="radio" name="im6" value="b"/> B. 1/3</li>
+        <li><input type="radio" name="im6" value="c"/> C. 1/2</li>
+        <li><input type="radio" name="im6" value="d"/> D. 1/5</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">7</span>What is 3/4 of 40? Show your working.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>30</strong> &mdash; Method: 40 &divide; 4 = 10; 10 &times; 3 = 30 (1 mark method &bull; 1 mark answer)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">8</span>What is the next number in the pattern? 5 &middot; 10 &middot; 15 &middot; 20 &middot; ___<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>25</strong> (pattern: add 5 each time)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">9</span>Write 0.75 as a fraction in its simplest form.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>3/4</strong> &mdash; 0.75 = 75/100 = 3/4 (1 mark fraction &bull; 1 mark simplification)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">10</span>Nomsa has R85.00. She buys a book for R32.50 and a pen for R12.00. How much money does she have left?<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Show your working..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>R40.50</strong> &mdash; R32.50 + R12.00 = R44.50; R85.00 &#8722; R44.50 = R40.50 (1 mark working &bull; 1 mark answer)</p></div>
+    </div>
+
+    <div class="result-banner" id="res-int-math"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('int-math')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-int-math" onclick="resetAssessment('int-math')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-int-math" onclick="downloadResults('int-math')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-int-math" onclick="downloadCSV('int-math')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- INT ISIZULU -->
+  <div class="subj-panel" id="int-zu">
+    <div class="assess-header">
+      <h2>isiZulu &#8212; Intermediate Phase</h2>
+      <p>Grades 4&#8211;7 &middot; Ukufunda, Amagama, Amabizo kanye Nohlelo lolimi</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">30 Minutes</span><span class="meta-chip">20 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Imiyalelo</strong><p>Phendula yonke imibuzo. Funda isiqephu ngaphambi kokuphendula imibuzo 1&#8211;4. Bhala ngezimpendulo ezigcwele lapho kudzingeka.</p></div>
+    <div class="passage"><div class="passage-label">Funda lesi siqephu bese uphendula imibuzo 1&#8211;4</div><p>UThandi uvuke ekuseni kakhulu. Ugeze, wagqoka, wadla isidlo sasekuseni. Unina wamxoxela indaba ngezinyoni. UThandi uthanda kakhulu izinyoni. Ekhaya banawo amaphupho amathathu. Izinyoni zihuba kamnandi ekuseni. UThandi wajabula kakhulu nalolo suku.</p></div>
+    <div class="section-title">Imibuzo</div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">1</span>UThandi wenzani ekuseni?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="iz1" value="a"/> A. Walala</li>
+        <li><input type="radio" name="iz1" value="b"/> B. Wageza, wagqoka, wadla isidlo sasekuseni</li>
+        <li><input type="radio" name="iz1" value="c"/> C. Wahamba esikoleni</li>
+        <li><input type="radio" name="iz1" value="d"/> D. Wadlala nezimoto</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">2</span>Ubani oxoxele UThandi indaba ngezinyoni?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="iz2" value="a"/> A. Ubaba</li>
+        <li><input type="radio" name="iz2" value="b"/> B. Umfowabo</li>
+        <li><input type="radio" name="iz2" value="c"/> C. Unina</li>
+        <li><input type="radio" name="iz2" value="d"/> D. Umngane</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">3</span>Bhala izibizo (nouns) EZIMBILI esiqeshini.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="1.          2."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Noma iziphi EZIMBILI: <strong>UThandi / unina / indaba / izinyoni / amaphupho / ekhaya</strong> (1 mark ngasinye)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">4</span>Incazelo yegama elithi "wajabula" ukuthi:<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="iz4" value="a"/> A. Walila</li>
+        <li><input type="radio" name="iz4" value="b"/> B. Wajabula / Wathokoza</li>
+        <li><input type="radio" name="iz4" value="c"/> C. Wadinwa</li>
+        <li><input type="radio" name="iz4" value="d"/> D. Wakhathala</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">5</span>Gcwalisa: "Izinyoni zi___ kamnandi." (huba / dlala / gijima)<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>huba</strong> &mdash; Izinyoni zihuba kamnandi.</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Yisiphi isibizo esilula esisho "home" ngesiZulu?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="iz6" value="a"/> A. isikole</li>
+        <li><input type="radio" name="iz6" value="b"/> B. ekhaya</li>
+        <li><input type="radio" name="iz6" value="c"/> C. indlela</li>
+        <li><input type="radio" name="iz6" value="d"/> D. umuntu</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">7</span>Lungisa lo musho: "izinja zi gijima."<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Umusho olungisiwe..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Izinja zigijima.</strong> (susa isikhala phakathi kwe-zi ne-gijima)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">8</span>Bhala esinye isibizo esiningi (plural): indlu &#8594; ___<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>izindlu</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">9</span>Chaza ngomusho owodwa: "Uthanda ukwenzani UThandi?"<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Bhala impendulo yakho lapha..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>UThandi uthanda izinyoni.</strong> (1 mark okuqukethwe &bull; 1 mark umusho ofanele)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">10</span>Bhala umusho owodwa ngento oyithandayo. Sebenzisa isibizo nozenzo.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Bhala lapha..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isib: <strong>"Ngithanda ukudlala ibhola."</strong> (1 mark isibizo &bull; 1 mark isenzo esisetyenziswe kahle)</p></div>
+    </div>
+
+    <div class="result-banner" id="res-int-zu"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('int-zu')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-int-zu" onclick="resetAssessment('int-zu')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-int-zu" onclick="downloadResults('int-zu')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-int-zu" onclick="downloadCSV('int-zu')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+</div>
+
+<div class="level-panel" id="panel-sen">
+  <div class="subject-tabs">
+    <button class="subj-btn s-en" onclick="switchSubj('sen','en',this)">&#128218; English</button>
+    <button class="subj-btn" onclick="switchSubj('sen','math',this)">&#128290; Mathematics</button>
+    <button class="subj-btn" onclick="switchSubj('sen','zu',this)">&#128483; isiZulu</button>
+  </div>
+
+  <!-- SEN ENGLISH -->
+  <div class="subj-panel active" id="sen-en">
+    <div class="assess-header">
+      <h2>English &#8212; Senior Phase</h2>
+      <p>Grades 8&#8211;9 &middot; Comprehension, Grammar, Vocabulary in Context &amp; Writing</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">40 Minutes</span><span class="meta-chip">25 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Read the passage carefully. Answer ALL questions. Write in full sentences where required. Pay attention to mark allocations.</p></div>
+    <div class="passage"><div class="passage-label">Read the passage and answer Questions 1&#8211;5</div><p>Climate change is one of the most serious challenges facing our planet today. Rising temperatures are causing ice caps to melt, sea levels to rise, and extreme weather events to become more frequent. Scientists warn that if we do not reduce our carbon emissions, the consequences could be devastating for millions of people. However, many young people across the world are taking action. They are demanding that governments and businesses make urgent changes to protect the environment for future generations. Their message is clear: the time to act is now.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">1</span>What is the main idea of the passage?<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Write in your own words..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Climate change is a serious global challenge causing devastating consequences. Young people are taking action by demanding urgent changes from governments and businesses. (1 mark: problem identified &bull; 1 mark: response mentioned)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">2</span>List TWO effects of climate change mentioned in the passage.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="1.&#10;2."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Any TWO of: <strong>ice caps melting / sea levels rising / more frequent extreme weather events</strong>. (1 mark each)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">3</span>What does the word "devastating" mean as used in the passage?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="se3" value="a"/> A. Slightly inconvenient</li>
+        <li><input type="radio" name="se3" value="b"/> B. Extremely destructive and harmful</li>
+        <li><input type="radio" name="se3" value="c"/> C. Mildly unpleasant</li>
+        <li><input type="radio" name="se3" value="d"/> D. Completely harmless</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">4</span>What are young people doing about climate change, according to the passage?<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your answer..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Young people are <strong>demanding that governments and businesses make urgent changes</strong> to protect the environment for future generations. (2 marks for full answer; 1 mark partial)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">5</span>Do you agree that young people can make a difference? Give ONE reason for your answer.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Your opinion with a reason..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Open-ended opinion question. Award: (1 mark) clear Yes/No stance + (1 mark) valid reason that supports the stance.</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="c" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Identify the part of speech of the underlined word: "She <u>quickly</u> finished her homework."<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="se6" value="a"/> A. Adjective</li>
+        <li><input type="radio" name="se6" value="b"/> B. Noun</li>
+        <li><input type="radio" name="se6" value="c"/> C. Adverb</li>
+        <li><input type="radio" name="se6" value="d"/> D. Verb</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">7</span>Rewrite in the passive voice: "The dog bit the man."<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Write the passive voice sentence..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>"The man was bitten by the dog."</strong> (1 mark: correct passive structure &bull; 1 mark: correct tense)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">8</span>Choose the correct word: "There are ___ people at the meeting."<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="se8" value="a"/> A. less</li>
+        <li><input type="radio" name="se8" value="b"/> B. fewer</li>
+        <li><input type="radio" name="se8" value="c"/> C. little</li>
+        <li><input type="radio" name="se8" value="d"/> D. much</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">9</span>Give a synonym for the word "urgent" as used in the passage.<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Your answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Accept: <strong>immediate / pressing / critical / vital</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">10</span>Write a paragraph (3&#8211;4 sentences) about what YOU can do to help protect the environment.<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your paragraph here..." style="min-height:120px;"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer (Marking Guide)</div><p>(1 mark) <strong>Content</strong>: relevant personal actions mentioned. (1 mark) <strong>Language</strong>: correct grammar and vocabulary. (1 mark) <strong>Structure</strong>: clear paragraph with 3&#8211;4 sentences. E.g. "I can help protect the environment by recycling waste at home..."</p></div>
+    </div>
+
+    <div class="result-banner" id="res-sen-en"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('sen-en')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-sen-en" onclick="resetAssessment('sen-en')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-sen-en" onclick="downloadResults('sen-en')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-sen-en" onclick="downloadCSV('sen-en')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- SEN MATHEMATICS -->
+  <div class="subj-panel" id="sen-math">
+    <div class="assess-header">
+      <h2>Mathematics &#8212; Senior Phase</h2>
+      <p>Grades 8&#8211;9 &middot; Integers, Fractions, Algebra, Ratios &amp; Word Problems</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">40 Minutes</span><span class="meta-chip">25 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Answer ALL questions. Show ALL working for full marks. Calculators are NOT allowed. Simplify all answers where possible.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">1</span>Calculate: &#8722;8 + (&#8722;5) &#8722; (&#8722;3) =<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>&#8722;10</strong> &mdash; &#8722;8 + (&#8722;5) = &#8722;13; &#8722;13 &#8722; (&#8722;3) = &#8722;13 + 3 = &#8722;10 (1 mark working &bull; 1 mark answer)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">2</span>Calculate: (&#8722;4) &times; (&#8722;6) &divide; 3 =<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>8</strong> &mdash; (&#8722;4) &times; (&#8722;6) = 24; 24 &divide; 3 = 8</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">3</span>Simplify: 2/3 + 3/4 =<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>17/12 = 1 5/12</strong> &mdash; LCM = 12; 8/12 + 9/12 = 17/12</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">4</span>Solve for x: 3x + 7 = 22<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>x = 5</strong> &mdash; 3x = 22 &#8722; 7 = 15; x = 5</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">5</span>Solve for x: 2(x &#8722; 3) = 10<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>x = 8</strong> &mdash; 2x &#8722; 6 = 10; 2x = 16; x = 8</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Simplify the ratio 36 : 48.<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Simplest form..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>3 : 4</strong> &mdash; HCF = 12; 36&divide;12 : 48&divide;12</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">7</span>A bag contains red and blue marbles in the ratio 3:5. If there are 24 red marbles, how many blue marbles are there?<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Show your working..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>40 blue marbles</strong> &mdash; 1 part = 24 &divide; 3 = 8; blue = 5 &times; 8 = 40 (1 mark ratio &bull; 1 mark method &bull; 1 mark answer)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">8</span>What is 15% of 240?<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>36</strong> &mdash; 15/100 &times; 240 = 36</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">9</span>Convert 0.325 to a percentage.<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>32.5%</strong> &mdash; 0.325 &times; 100</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">10</span>A shop offers a 20% discount on a jacket that costs R650. What is the sale price?<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Show all working..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>R520</strong> &mdash; Discount = 20/100 &times; 650 = R130; Sale price = R650 &#8722; R130 = R520 (1 mark % &bull; 1 mark discount &bull; 1 mark final price)</p></div>
+    </div>
+
+    <div class="result-banner" id="res-sen-math"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('sen-math')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-sen-math" onclick="resetAssessment('sen-math')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-sen-math" onclick="downloadResults('sen-math')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-sen-math" onclick="downloadCSV('sen-math')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- SEN ISIZULU -->
+  <div class="subj-panel" id="sen-zu">
+    <div class="assess-header">
+      <h2>isiZulu &#8212; Senior Phase</h2>
+      <p>Grades 8&#8211;9 &middot; Ukufunda, Uhlelo, Izabizwana, Amabizo kanye Nezenzo</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">40 Minutes</span><span class="meta-chip">25 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Imiyalelo</strong><p>Phendula yonke imibuzo. Funda isiqephu ngokucophelela. Bhala ngezimpendulo ezigcwele lapho kudzingeka.</p></div>
+    <div class="passage"><div class="passage-label">Funda lesi siqephu bese uphendula imibuzo 1&#8211;4</div><p>Imfundo ibalulekile empilweni yabantu bonke. Izingane ezikhutheleyo ziyakwazi ukuphumelela futhi zifeze amaphupho azo. Esikoleni, abafundi bafunda izibalo, isiNgisi kanye nezinye izifundo ezibalulekile. Uthisha obhekelela abafundi bakhe ngothando uyabasiza ukuba baphumelele. Abazali nabo kufanele basize izingane zabo ekhaya ukuze ziqhubeke phambili.</p></div>
+    <div class="section-title">Imibuzo</div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">1</span>Ngokwesiqephu, yini ebalulekile empilweni yabantu bonke?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="sz1" value="a"/> A. Imali</li>
+        <li><input type="radio" name="sz1" value="b"/> B. Imfundo</li>
+        <li><input type="radio" name="sz1" value="c"/> C. Ukudla</li>
+        <li><input type="radio" name="sz1" value="d"/> D. Izingubo</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">2</span>Chaza ngomusho owodwa ukuthi uthisha obhekelela abafundi bakhe ngothando wenzani?<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Bhala impendulo yakho..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Uthisha obhekelela abafundi bakhe ngothando uyabasiza ukuba baphumelele.</strong> (1 mark okuqukethwe &bull; 1 mark umusho ofanele)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">3</span>Khipha izenzo (verbs) EZIMBILI esiqeshini.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="1.          2."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Noma iziphi EZIMBILI: <strong>bafunda / phumelela / feza / bhekelela / basize / qhubeka</strong> (1 mark ngasinye)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">4</span>Incazelo yegama elithi "ezikhutheleyo" ukuthi:<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="sz4" value="a"/> A. Azinawo amandla</li>
+        <li><input type="radio" name="sz4" value="b"/> B. Zikhona, zizimisele futhi zisebenza kanzima</li>
+        <li><input type="radio" name="sz4" value="c"/> C. Ziyadangala</li>
+        <li><input type="radio" name="sz4" value="d"/> D. Azifuni ukufunda</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">5</span>Lungisa lo musho: "abafundi bafund izibalo."<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Umusho olungisiwe..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Abafundi bafunda izibalo.</strong></p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">6</span>Chaza isibizwana (pronoun) esisho "they" ngesiZulu uma ukhuluma ngabafundi.<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="sz6" value="a"/> A. yena</li>
+        <li><input type="radio" name="sz6" value="b"/> B. bona</li>
+        <li><input type="radio" name="sz6" value="c"/> C. wona</li>
+        <li><input type="radio" name="sz6" value="d"/> D. zona</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">7</span>Bhala umusho ngesikhathi esizayo (future tense) usebenzise: "abafundi / ukufunda"<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Bhala lapha..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Abafundi bazofunda.</strong> (1 mark: future marker -zo- &bull; 1 mark: umusho ofanele)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">8</span>Yini umehluko phakathi kwesibizo kanye nesenzo? Nikeza isibonelo ngasinye.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Chaza umehluko..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isibizo = igama lento/umuntu (isib. <strong>uthisha</strong>). Isenzo = igama lokukhombisa ukwenza (isib. <strong>ukufunda</strong>). (1 mark ngasinye)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">9</span>Phendula ngomusho owodwa: "Ucabanga ukuthi yini eyenza umfundi aphumelele?"<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Impendulo yakho..."></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isib: <strong>"Ukuzinikela kanye nokufunda kanzima kwenza umfundi aphumelele."</strong> (1 mark okuqukethwe &bull; 1 mark umusho)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">10</span>Bhala izimusho EZIMBILI ngokubaluleka kwemfundo. Sebenzisa izenzo nezibizo.<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Bhala lapha..." style="min-height:100px;"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isib: <strong>"Imfundo ivula amathuba empilo. Abafundi abafunda kanzima bayakwazi ukuphumelela."</strong> (1 mark: isibizo &bull; 1 mark: isenzo &bull; 1 mark: izimusho ezimbili ezigcwele)</p></div>
+    </div>
+
+    <div class="result-banner" id="res-sen-zu"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('sen-zu')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-sen-zu" onclick="resetAssessment('sen-zu')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-sen-zu" onclick="downloadResults('sen-zu')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-sen-zu" onclick="downloadCSV('sen-zu')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+</div>
+
+<div class="level-panel" id="panel-fet">
+  <div class="subject-tabs">
+    <button class="subj-btn s-en" onclick="switchSubj('fet','en',this)">&#128218; English</button>
+    <button class="subj-btn" onclick="switchSubj('fet','math',this)">&#128290; Mathematics</button>
+    <button class="subj-btn" onclick="switchSubj('fet','zu',this)">&#128483; isiZulu</button>
+  </div>
+
+  <!-- FET ENGLISH -->
+  <div class="subj-panel active" id="fet-en">
+    <div class="assess-header">
+      <h2>English &#8212; FET Phase</h2>
+      <p>Grades 10&#8211;12 &middot; Comprehension, Critical Thinking, Grammar, Editing &amp; Vocabulary</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">50 Minutes</span><span class="meta-chip">30 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Read all passages and questions carefully. Answer ALL questions. Write in well-constructed sentences and paragraphs. Note the mark allocations carefully.</p></div>
+    <div class="passage"><div class="passage-label">Read the passage and answer Questions 1&#8211;6</div><p>South Africa is a nation of remarkable diversity, yet it continues to grapple with deep inequalities rooted in its apartheid past. While the Constitution of 1996 guarantees equal rights for all citizens, many South Africans still face barriers to quality education, healthcare, and economic opportunity. Unemployment remains critically high, particularly among young people, with youth unemployment exceeding 60% in some estimates. Critics argue that government policies have failed to translate constitutional promises into tangible realities. Others, however, point to the progress made in extending services to previously disadvantaged communities. The path forward requires not only policy reform but also active civic participation from every South African.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">1</span>Summarise the main argument of the passage in 2&#8211;3 sentences in your own words.<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your summary here..." style="min-height:100px;"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>South Africa faces deep inequalities despite constitutional promises of equality. Youth unemployment is critically high and government policies have been criticised. Both policy reform and civic participation are needed to move forward. (1 mark per key idea)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">2</span>What statistic is given about youth unemployment in South Africa?<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Your answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Youth unemployment exceeds <strong>60%</strong> in some estimates.</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">3</span>What does the word "tangible" mean as used in the passage?<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="fe3" value="a"/> A. Imaginary and impossible</li>
+        <li><input type="radio" name="fe3" value="b"/> B. Real, concrete and measurable</li>
+        <li><input type="radio" name="fe3" value="c"/> C. Distant and theoretical</li>
+        <li><input type="radio" name="fe3" value="d"/> D. Hidden and secretive</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">4</span>Identify TWO perspectives presented in the passage regarding government performance.<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><textarea placeholder="Perspective 1:&#10;Perspective 2:"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>Perspective 1:</strong> Government has failed to translate constitutional promises into realities. <strong>Perspective 2:</strong> Progress has been made in extending services to disadvantaged communities. (1 mark each)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="3">
+      <div class="q-text"><span class="q-num">5</span>Is the writer biased for or against the government? Justify your answer with evidence from the text.<span class="q-marks">(3)</span></div>
+      <div class="short-answer"><textarea placeholder="Your critical response..." style="min-height:110px;"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer (Marking Guide)</div><p>(1 mark) Clear stance stated. (1 mark) Relevant textual evidence provided. (1 mark) Logical reasoning. Note: The writer appears <strong>balanced</strong> &#8212; both critical and positive views are presented.</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">6</span>Identify and correct the errors: "The government have failed to address the issue's properly."<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Write the corrected sentence..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>"The government has failed to address the issues properly."</strong> &mdash; "have"&#8594;"has" (subject-verb agreement); "issue's"&#8594;"issues" (no apostrophe needed). (1 mark each)</p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2">
+      <div class="q-text"><span class="q-num">7</span>Rewrite in reported speech: He said, "I will attend the meeting tomorrow."<span class="q-marks">(2)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Reported speech version..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>"He said that he would attend the meeting the following day."</strong> (1 mark: tense shift &bull; 1 mark: time reference changed)</p></div>
+    </div>
+
+    <div class="question" data-type="mc" data-answer="d" data-marks="1">
+      <div class="q-text"><span class="q-num">8</span>Choose the most appropriate word: "The new law had far-reaching ___ for education."<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="fe8" value="a"/> A. affects</li>
+        <li><input type="radio" name="fe8" value="b"/> B. implications</li>
+        <li><input type="radio" name="fe8" value="c"/> C. effects</li>
+        <li><input type="radio" name="fe8" value="d"/> D. B and C are both correct</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="1">
+      <div class="q-text"><span class="q-num">9</span>Give an antonym for the word "inequality".<span class="q-marks">(1)</span></div>
+      <div class="short-answer"><input type="text" placeholder="Your answer..."/></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p>Accept: <strong>equality / equity / fairness</strong></p></div>
+    </div>
+
+    <div class="question" data-type="short" data-marks="4">
+      <div class="q-text"><span class="q-num">10</span>Write a well-structured paragraph (4&#8211;5 sentences) arguing FOR or AGAINST compulsory civic participation for all South African citizens.<span class="q-marks">(4)</span></div>
+      <div class="short-answer"><textarea placeholder="Write your paragraph here..." style="min-height:140px;"></textarea></div>
+      <div class="model-answer"><div class="model-answer-label">&#10003; Model Answer (Marking Guide)</div><p>(1 mark) Clear argument stated in topic sentence. (1 mark) At least two supporting points. (1 mark) Correct grammar and varied vocabulary. (1 mark) Logical conclusion. E.g. "Compulsory civic participation would strengthen democracy in South Africa..."</p></div>
+    </div>
+
+    <div class="result-banner" id="res-fet-en"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('fet-en')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-fet-en" onclick="resetAssessment('fet-en')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-fet-en" onclick="downloadResults('fet-en')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-fet-en" onclick="downloadCSV('fet-en')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- FET MATHEMATICS -->
+  <div class="subj-panel" id="fet-math">
+    <div class="assess-header">
+      <h2>Mathematics &#8212; FET Phase</h2>
+      <p>Grades 10&#8211;12 &middot; Algebra, Linear Equations, Functions, Percentages &amp; Word Problems</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">50 Minutes</span><span class="meta-chip">30 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Instructions</strong><p>Answer ALL questions. Show ALL working for full marks. Calculators are NOT permitted. Express answers to TWO decimal places where applicable.</p></div>
+    <div class="section-title">Questions</div>
+
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">1</span>Simplify: 3a&#178; &#8722; 5a + 2a&#178; + 7a &#8722; 3<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Simplified expression..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>5a&#178; + 2a &#8722; 3</strong> &mdash; collect like terms: (3a&#178;+2a&#178;) + (&#8722;5a+7a) &#8722; 3</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">2</span>Factorise: x&#178; &#8722; 9<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Factorised form..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>(x &#8722; 3)(x + 3)</strong> &mdash; difference of two squares: a&#178;&#8722;b&#178; = (a&#8722;b)(a+b)</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">3</span>Solve for x: 5x &#8722; 3 = 2x + 9<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Show working and answer..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>x = 4</strong> &mdash; 3x = 12; x = 4</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">4</span>Solve for x: (x + 2)(x &#8722; 3) = 0<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Both values of x..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>x = &#8722;2 or x = 3</strong> &mdash; set each factor equal to zero</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">5</span>Given f(x) = 2x + 5, find f(&#8722;3).<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Show substitution and answer..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>f(&#8722;3) = &#8722;1</strong> &mdash; 2(&#8722;3) + 5 = &#8722;6 + 5 = &#8722;1</p></div></div>
+    <div class="question" data-type="short" data-marks="3"><div class="q-text"><span class="q-num">6</span>What is the gradient of the line passing through (2, 3) and (6, 11)?<span class="q-marks">(3)</span></div><div class="short-answer"><textarea placeholder="Show working..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>m = 2</strong> &mdash; m = (11&#8722;3)/(6&#8722;2) = 8/4 = 2 (1 formula &bull; 1 substitution &bull; 1 answer)</p></div></div>
+    <div class="question" data-type="short" data-marks="3"><div class="q-text"><span class="q-num">7</span>A population increases from 12 500 to 15 000. Calculate the percentage increase.<span class="q-marks">(3)</span></div><div class="short-answer"><textarea placeholder="Show working..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>20%</strong> &mdash; increase = 2500; (2500/12500) &times; 100 = 20% (1 increase &bull; 1 formula &bull; 1 answer)</p></div></div>
+    <div class="question" data-type="short" data-marks="4"><div class="q-text"><span class="q-num">8</span>Solve the simultaneous equations: x + y = 10 and 2x &#8722; y = 5<span class="q-marks">(4)</span></div><div class="short-answer"><textarea placeholder="Show all working..." style="min-height:110px;"></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>x = 5, y = 5</strong> &mdash; Add: 3x = 15, x = 5; substitute: y = 5 (1 method &bull; 1 x &bull; 1 y &bull; 1 check)</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">9</span>Simplify: (2x&#179;y&#178;) &times; (3x&#178;y)<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Simplified answer..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>6x&#8309;y&#179;</strong> &mdash; 2&times;3=6; x&#179;&#8314;&#178;=x&#8309;; y&#178;&#8314;&#185;=y&#179;</p></div></div>
+    <div class="question" data-type="short" data-marks="4"><div class="q-text"><span class="q-num">10</span>Thabo invests R8 000 at a simple interest rate of 7.5% per annum. How much interest will he earn after 3 years? What will his total amount be?<span class="q-marks">(4)</span></div><div class="short-answer"><textarea placeholder="Show all working..." style="min-height:110px;"></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Model Answer</div><p><strong>Interest = R1 800; Total = R9 800</strong> &mdash; SI = 8000 &times; 0.075 &times; 3 = R1 800 (1 formula &bull; 1 interest &bull; 1 total &bull; 1 units)</p></div></div>
+
+    <div class="result-banner" id="res-fet-math"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('fet-math')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-fet-math" onclick="resetAssessment('fet-math')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-fet-math" onclick="downloadResults('fet-math')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-fet-math" onclick="downloadCSV('fet-math')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+
+  <!-- FET ISIZULU -->
+  <div class="subj-panel" id="fet-zu">
+    <div class="assess-header">
+      <h2>isiZulu &#8212; FET Phase</h2>
+      <p>Grades 10&#8211;12 &middot; Ukufunda Okujulile, Uhlelo, Isigodi Samagama kanye Nokubhala</p>
+      <div class="assess-meta"><span class="meta-chip">10 Questions</span><span class="meta-chip">50 Minutes</span><span class="meta-chip">30 Marks</span></div>
+    </div>
+    <div class="instructions"><strong>Imiyalelo</strong><p>Phendula yonke imibuzo. Funda isiqephu ngokucophelela kakhulu. Bhala ngezimpendulo ezigcwele nezinephuzu. Qaphela inani lamamarkhi.</p></div>
+    <div class="passage"><div class="passage-label">Funda lesi siqephu bese uphendula imibuzo 1&#8211;5</div><p>Itheknoloji iguqule indlela abantu abasebenza ngayo. Namuhla, abantu abaningi basebenzisa amafomu okuphatha amabhizinisi abo ngekhompyutha noma ngeselula. Lezi zinto zisiza ekushesha futhi zenze imisebenzi ibe lula. Kodwa-ke, kukhona nongcolile abasebenzisa lezi zinto ngendlela engalungile ukuze babengelane nabanye abantu. Ngakho-ke, kubalulekile ukuthi abantu bafunde ukusebenzisa itheknoloji ngendlela efanele nokuphepha.</p></div>
+    <div class="section-title">Imibuzo</div>
+
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">1</span>Yiluphi uguquko olukhulunywayo esiqeshini?<span class="q-marks">(2)</span></div><div class="short-answer"><textarea placeholder="Bhala impendulo yakho..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Itheknoloji iguqule indlela abantu abasebenza ngayo. Abantu manje basebenzisa amakhompyutha namaselula. (1 mark ngasinye)</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">2</span>Yini inkinga ebikhulunywa ngayo esiqeshini?<span class="q-marks">(2)</span></div><div class="short-answer"><textarea placeholder="Bhala impendulo yakho..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Kukhona abantu ababi abasebenzisa itheknoloji ngendlela engalungile</strong> ukuze babengelane nabanye. (2 marks for full answer)</p></div></div>
+
+    <div class="question" data-type="mc" data-answer="b" data-marks="1">
+      <div class="q-text"><span class="q-num">3</span>Incazelo yegama elithi "inguqulo" ukuthi:<span class="q-marks">(1)</span></div>
+      <ul class="options">
+        <li><input type="radio" name="fz3" value="a"/> A. Ukungashintshi</li>
+        <li><input type="radio" name="fz3" value="b"/> B. Ukuguquka / ukushintsha</li>
+        <li><input type="radio" name="fz3" value="c"/> C. Ukuqhubeka njengakuqala</li>
+        <li><input type="radio" name="fz3" value="d"/> D. Ukubuyela emuva</li>
+      </ul>
+    </div>
+
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">4</span>Khipha umusho obalulekile (topic sentence). Chaza ukuthi uyisiphi futhi ubaluleke ngani.<span class="q-marks">(2)</span></div><div class="short-answer"><textarea placeholder="Umusho obalulekile kanye nencazelo..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>"Itheknoloji iguqule indlela abantu abasebenza ngayo."</strong> &#8212; Umusho wokuqala uyisihloko ngoba wethula umqondo omkhulu wesiqephu. (1 umusho &bull; 1 incazelo)</p></div></div>
+    <div class="question" data-type="short" data-marks="3"><div class="q-text"><span class="q-num">5</span>Bhala isifinyezo ngamazwi akho &#8212; izimusho EZIMBILI.<span class="q-marks">(3)</span></div><div class="short-answer"><textarea placeholder="Isifinyezo sakho..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isib: <strong>"Itheknoloji inqube ukusebenza kwabantu. Nokho, kubalulekile ukuyisebenzisa kahle ukuze igwenywe imiphumela emibi."</strong> (1 mark ngasinye + 1 ukuvumelana)</p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">6</span>Lungisa lo musho: "Abantu basebenzisa itheknoloji ngendlela engalungile kodwa banenelisi ukukhuluma."<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Umusho olungisiwe..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isib: <strong>"Abantu abanye basebenzisa itheknoloji ngendlela engalungile futhi abakwazi ukukhuluma ngokuhloniphekile."</strong></p></div></div>
+    <div class="question" data-type="short" data-marks="1"><div class="q-text"><span class="q-num">7</span>Nikeza isifaniso (synonym) segama elithi "kubalulekile".<span class="q-marks">(1)</span></div><div class="short-answer"><input type="text" placeholder="Isifaniso..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Accept: <strong>kunesidingo / kuphuthumayo / kudingekile</strong></p></div></div>
+    <div class="question" data-type="short" data-marks="2"><div class="q-text"><span class="q-num">8</span>Bhala lo musho ngesikhathi esingaphambili (past tense): "Abantu basebenzisa itheknoloji."<span class="q-marks">(2)</span></div><div class="short-answer"><input type="text" placeholder="Umusho osesikhathini esedlule..."/></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p><strong>Abantu basebenzise itheknoloji.</strong> (1 mark: -se- past tense marker &bull; 1 mark: umusho ofanele)</p></div></div>
+    <div class="question" data-type="short" data-marks="3"><div class="q-text"><span class="q-num">9</span>Chaza umehluko phakathi kwezandiso (adverb) neziphawulo (adjective). Nikeza isibonelo ngasinye.<span class="q-marks">(3)</span></div><div class="short-answer"><textarea placeholder="Impendulo yakho..."></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo</div><p>Isandiso: sichaza indlela okwenziwa ngayo isenzo (isib. <strong>"wasebenza kanzima"</strong>). Isiphawulo: sichaza ibizo (isib. <strong>"indoda enkulu"</strong>). (1 ncazelo + 1 isibonelo ngasinye)</p></div></div>
+    <div class="question" data-type="short" data-marks="4"><div class="q-text"><span class="q-num">10</span>Bhala isigaba esikhuluma ngokulungiswa kokusetshenziswa kwetheknoloji entsheni. Sebenzisa izimusho EZINNE noma EZINHLANU.<span class="q-marks">(4)</span></div><div class="short-answer"><textarea placeholder="Bhala isigaba sakho lapha..." style="min-height:140px;"></textarea></div><div class="model-answer"><div class="model-answer-label">&#10003; Impendulo Yesibonelo (Marking Guide)</div><p>(1) Okuqukethwe: imibono efanele. (1) Ulimi: izenzo, amabizo nezandiso zisetshenziselwe kahle. (1) Isakhiwo: isigaba esiphelele nesihloko nesiphetho. (1) Ikhwalithi: isiZulu esisezingeni.</p></div></div>
+
+    <div class="result-banner" id="res-fet-zu"></div>
+    <div class="submit-area">
+      <button class="submit-btn" onclick="submitAssessment('fet-zu')">&#10003; Submit &amp; Get Feedback</button>
+      <button class="reset-btn" id="rst-fet-zu" onclick="resetAssessment('fet-zu')">&#8635; Try Again</button>
+      <button class="download-btn" id="dl-fet-zu" onclick="downloadResults('fet-zu')">&#11015; PDF Report</button>
+      <button class="csv-btn" id="csv-fet-zu" onclick="downloadCSV('fet-zu')">&#11015; Excel / CSV</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #assessment-content -->
+
+<script>
+function startAssessment() {
+  var valid = true;
+
+  var firstname = document.getElementById('std-firstname').value.trim();
+  var surname   = document.getElementById('std-surname').value.trim();
+  var age       = parseInt(document.getElementById('std-age').value);
+  var grade     = document.getElementById('std-grade').value;
+  var school    = document.getElementById('std-school').value.trim();
+
+  // Validate each field
+  function setError(inputId, errId, show) {
+    document.getElementById(inputId).classList.toggle('error', show);
+    document.getElementById(errId).classList.toggle('show', show);
+    if (show) valid = false;
+  }
+
+  setError('std-firstname', 'err-firstname', !firstname);
+  setError('std-surname',   'err-surname',   !surname);
+  setError('std-age',       'err-age',       !age || age < 8 || age > 20);
+  setError('std-grade',     'err-grade',     !grade);
+  setError('std-school',    'err-school',    !school);
+
+  if (!valid) return;
+
+  // Populate badge
+  document.getElementById('badge-name').textContent   = firstname + ' ' + surname;
+  document.getElementById('badge-grade').textContent  = grade;
+  document.getElementById('badge-school').textContent = school;
+  document.getElementById('badge-age').textContent    = age;
+
+  // Show content, hide form
+  document.getElementById('student-form-section').style.display = 'none';
+  document.getElementById('student-badge').style.display = 'block';
+  document.getElementById('student-badge').querySelector('.student-badge-inner').classList.add('show');
+  document.getElementById('assessment-content').style.display = 'block';
+  document.getElementById('assessment-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function editDetails() {
+  document.getElementById('student-form-section').style.display = 'block';
+  document.getElementById('student-badge').style.display = 'none';
+  document.getElementById('assessment-content').style.display = 'none';
+  document.getElementById('student-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function downloadCSV(sid) {
+  var panel = document.getElementById(sid);
+
+  // Learner details
+  var name   = document.getElementById('badge-name').textContent   || 'Unknown';
+  var grade  = document.getElementById('badge-grade').textContent  || '';
+  var school = document.getElementById('badge-school').textContent || '';
+  var age    = document.getElementById('badge-age').textContent    || '';
+  var date   = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+
+  var labelMap = {
+    'int-en':'English - Intermediate Phase (Grades 4-7)',
+    'int-math':'Mathematics - Intermediate Phase (Grades 4-7)',
+    'int-zu':'isiZulu - Intermediate Phase (Grades 4-7)',
+    'sen-en':'English - Senior Phase (Grades 8-9)',
+    'sen-math':'Mathematics - Senior Phase (Grades 8-9)',
+    'sen-zu':'isiZulu - Senior Phase (Grades 8-9)',
+    'fet-en':'English - FET Phase (Grades 10-12)',
+    'fet-math':'Mathematics - FET Phase (Grades 10-12)',
+    'fet-zu':'isiZulu - FET Phase (Grades 10-12)'
+  };
+  var assessLabel = labelMap[sid] || sid;
+
+  // Score info
+  var banner  = document.getElementById('res-' + sid);
+  var scoreEl = banner.querySelector('.result-score');
+  var pctEl   = banner.querySelector('.result-pct');
+  var titleEl = banner.querySelector('[style*="font-weight:700"]');
+  var score   = scoreEl ? scoreEl.textContent : '';
+  var pct     = pctEl   ? pctEl.textContent.replace(/[()]/g,'') : '';
+  var perf    = titleEl ? titleEl.textContent : '';
+
+  function escCSV(val) {
+    val = (val || '').replace(/<[^>]+>/g, '').replace(/\n/g,' ').trim();
+    if (val.indexOf(',') > -1 || val.indexOf('"') > -1 || val.indexOf('\n') > -1) {
+      val = '"' + val.replace(/"/g, '""') + '"';
+    }
+    return val;
+  }
+
+  var rows = [];
+
+  // Header info block
+  rows.push(['Mentor Me Tutor - Assessment Results','','','','','']);
+  rows.push(['Assessment', escCSV(assessLabel),'','','','']);
+  rows.push(['Date', escCSV(date),'','','','']);
+  rows.push(['','','','','','']);
+  rows.push(['LEARNER DETAILS','','','','','']);
+  rows.push(['Name', escCSV(name), 'Grade', escCSV(grade), 'Age', escCSV(age)]);
+  rows.push(['School', escCSV(school),'','','','']);
+  rows.push(['','','','','','']);
+  rows.push(['SCORE SUMMARY','','','','','']);
+  rows.push(['Auto-marked Score', escCSV(score), 'Percentage', escCSV(pct), 'Performance', escCSV(perf)]);
+  rows.push(['','','','','','']);
+  rows.push(['QUESTION BREAKDOWN','','','','','']);
+  rows.push(['#', 'Question', 'Learner Answer', 'Model Answer', 'Marks Available', 'Result']);
+
+  // Questions
+  var questions = panel.querySelectorAll('.question');
+  questions.forEach(function(q, i) {
+    var type    = q.getAttribute('data-type');
+    var marks   = q.getAttribute('data-marks') || '1';
+    var qTextEl = q.querySelector('.q-text');
+    var qText   = qTextEl ? qTextEl.innerText.replace(/^\d+/, '').replace(/\(\d+\)$/, '').trim() : '';
+
+    var learnerAnswer = '';
+    var resultLabel   = '';
+    var modelAns      = '';
+
+    if (type === 'mc') {
+      var selected = q.querySelector('input[type=radio]:checked');
+      var correct  = q.getAttribute('data-answer');
+      if (selected) {
+        var li = q.querySelector('input[value="' + selected.value + '"]').parentElement;
+        learnerAnswer = li.textContent.trim();
+        resultLabel   = selected.value === correct ? 'Correct' : 'Incorrect';
+      } else {
+        learnerAnswer = 'Not answered';
+        resultLabel   = 'Skipped';
+      }
+      var correctLi = q.querySelector('input[value="' + correct + '"]');
+      if (correctLi) modelAns = correctLi.parentElement.textContent.trim();
+    } else {
+      var inp = q.querySelector('textarea, input[type=text], input[type=number]');
+      learnerAnswer = inp && inp.value.trim() ? inp.value.trim() : 'No answer written';
+      var maEl = q.querySelector('.model-answer p');
+      modelAns    = maEl ? maEl.innerText : '';
+      resultLabel = 'Tutor to mark';
+    }
+
+    rows.push([
+      String(i + 1),
+      escCSV(qText),
+      escCSV(learnerAnswer),
+      escCSV(modelAns),
+      marks,
+      escCSV(resultLabel)
+    ]);
+  });
+
+  // Build CSV string
+  var csv = rows.map(function(r){ return r.join(','); }).join('\r\n');
+
+  // Download
+  var BOM  = '\uFEFF'; // UTF-8 BOM so Excel opens correctly
+  var blob = new Blob([BOM + csv], {type:'text/csv;charset=utf-8;'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'MMT_' + name.replace(/\s+/g,'_') + '_' + sid + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadResults(sid) {
+  var panel = document.getElementById(sid);
+
+  // Learner details
+  var name   = document.getElementById('badge-name').textContent   || 'Unknown';
+  var grade  = document.getElementById('badge-grade').textContent  || '';
+  var school = document.getElementById('badge-school').textContent || '';
+  var age    = document.getElementById('badge-age').textContent    || '';
+  var date   = new Date().toLocaleDateString('en-ZA', {day:'2-digit',month:'long',year:'numeric'});
+
+  // Assessment label
+  var labelMap = {
+    'int-en':'English — Intermediate Phase (Grades 4–7)',
+    'int-math':'Mathematics — Intermediate Phase (Grades 4–7)',
+    'int-zu':'isiZulu — Intermediate Phase (Grades 4–7)',
+    'sen-en':'English — Senior Phase (Grades 8–9)',
+    'sen-math':'Mathematics — Senior Phase (Grades 8–9)',
+    'sen-zu':'isiZulu — Senior Phase (Grades 8–9)',
+    'fet-en':'English — FET Phase (Grades 10–12)',
+    'fet-math':'Mathematics — FET Phase (Grades 10–12)',
+    'fet-zu':'isiZulu — FET Phase (Grades 10–12)'
+  };
+  var assessLabel = labelMap[sid] || sid;
+
+  // Score from banner
+  var banner = document.getElementById('res-' + sid);
+  var scoreEl = banner.querySelector('.result-score');
+  var pctEl   = banner.querySelector('.result-pct');
+  var titleEl = banner.querySelector('[style*="font-weight:700"]');
+  var score   = scoreEl  ? scoreEl.textContent  : '—';
+  var pct     = pctEl    ? pctEl.textContent     : '';
+  var perf    = titleEl  ? titleEl.textContent   : '';
+
+  // Build question rows
+  var questions = panel.querySelectorAll('.question');
+  var qRows = '';
+  questions.forEach(function(q, i) {
+    var type    = q.getAttribute('data-type');
+    var marks   = q.getAttribute('data-marks');
+    var qTextEl = q.querySelector('.q-text');
+    var qText   = qTextEl ? qTextEl.innerText.replace(/^\d+/, '').trim() : '';
+
+    var learnerAnswer = '—';
+    var resultLabel   = '';
+    var modelAns      = '';
+
+    if (type === 'mc') {
+      var selected = q.querySelector('input[type=radio]:checked');
+      var correct  = q.getAttribute('data-answer');
+      if (selected) {
+        var li = q.querySelector('input[value="' + selected.value + '"]').parentElement;
+        learnerAnswer = li.textContent.trim();
+        resultLabel = selected.value === correct
+          ? '<span style="color:#27ae60;font-weight:700;">✓ Correct</span>'
+          : '<span style="color:#e74c3c;font-weight:700;">✗ Incorrect</span>';
+      } else {
+        learnerAnswer = '<em>Not answered</em>';
+        resultLabel = '<span style="color:#e67e22;font-weight:700;">— Skipped</span>';
+      }
+      // correct option text
+      var correctLi = q.querySelector('input[value="' + correct + '"]');
+      if (correctLi) modelAns = correctLi.parentElement.textContent.trim();
+    } else {
+      var inp = q.querySelector('textarea, input[type=text], input[type=number]');
+      learnerAnswer = inp && inp.value.trim() ? inp.value.trim() : '<em>No answer written</em>';
+      var maEl = q.querySelector('.model-answer p');
+      modelAns = maEl ? maEl.innerText : '';
+      resultLabel = '<span style="color:#2d6a8f;font-weight:700;">📝 Tutor to mark</span>';
+    }
+
+    qRows += '<tr style="border-bottom:1px solid #e8ecf0;">' +
+      '<td style="padding:10px 8px;font-weight:700;color:#1a2e45;vertical-align:top;white-space:nowrap;">' + (i+1) + '</td>' +
+      '<td style="padding:10px 8px;vertical-align:top;">' + qText + '</td>' +
+      '<td style="padding:10px 8px;vertical-align:top;">' + learnerAnswer + '</td>' +
+      '<td style="padding:10px 8px;vertical-align:top;">' + modelAns + '</td>' +
+      '<td style="padding:10px 8px;vertical-align:top;text-align:center;">' + marks + '</td>' +
+      '<td style="padding:10px 8px;vertical-align:top;text-align:center;">' + resultLabel + '</td>' +
+    '</tr>';
+  });
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>' +
+    '<title>Assessment Results – ' + name + '</title>' +
+    '<style>' +
+      'body{font-family:Arial,sans-serif;margin:0;padding:0;color:#2c2c2c;}' +
+      '@page{size:A4;margin:18mm 14mm;}' +
+      '.header{background:#1a2e45;color:#fff;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;}' +
+      '.header h1{font-size:1.15rem;margin:0;font-family:Georgia,serif;}' +
+      '.header .sub{font-size:.8rem;opacity:.75;margin-top:4px;}' +
+      '.header .date{font-size:.8rem;opacity:.75;}' +
+      '.learner-box{background:#f4f7fb;border-left:5px solid #f07c1e;padding:14px 24px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:0;}' +
+      '.learner-box .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#7a8a99;font-weight:700;}' +
+      '.learner-box .val{font-size:.95rem;font-weight:700;color:#1a2e45;margin-top:2px;}' +
+      '.score-box{background:#1a2e45;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:32px;}' +
+      '.score-big{font-family:Georgia,serif;font-size:2.4rem;font-weight:700;color:#f07c1e;}' +
+      '.score-pct{font-size:.9rem;opacity:.75;margin-top:2px;}' +
+      '.score-perf{font-size:1.1rem;font-weight:700;}' +
+      '.score-note{font-size:.8rem;opacity:.7;margin-top:4px;max-width:380px;line-height:1.5;}' +
+      '.section-title{font-family:Georgia,serif;font-size:1rem;color:#1a2e45;padding:14px 24px 6px;border-bottom:2px solid #edf0f4;margin-bottom:0;}' +
+      'table{width:100%;border-collapse:collapse;font-size:.82rem;}' +
+      'th{background:#edf0f4;padding:9px 8px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:#7a8a99;}' +
+      'td{vertical-align:top;}' +
+      'tr:nth-child(even){background:#fafbfc;}' +
+      '.footer{margin-top:20px;padding:12px 24px;font-size:.75rem;color:#aaa;border-top:1px solid #e8ecf0;text-align:center;}' +
+      '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' +
+    '</style></head><body>' +
+    '<div class="header">' +
+      '<div><div class="sub">Mentor Me Tutor · Entry Level Diagnostic Assessment</div><h1>' + assessLabel + '</h1></div>' +
+      '<div class="date">Date: ' + date + '</div>' +
+    '</div>' +
+    '<div class="learner-box">' +
+      '<div><div class="lbl">Learner Name</div><div class="val">' + name + '</div></div>' +
+      '<div><div class="lbl">Grade</div><div class="val">' + grade + '</div></div>' +
+      '<div><div class="lbl">Age</div><div class="val">' + age + '</div></div>' +
+      '<div><div class="lbl">School</div><div class="val">' + school + '</div></div>' +
+    '</div>' +
+    '<div class="score-box">' +
+      '<div><div class="score-big">' + score + '</div><div class="score-pct">' + pct + '</div></div>' +
+      '<div><div class="score-perf">' + perf + '</div>' +
+        '<div class="score-note">✏️ Written questions are marked by your tutor. Compare your answers to the model answers below.</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="section-title">Question-by-Question Breakdown</div>' +
+    '<table><thead><tr>' +
+      '<th style="width:30px;">#</th>' +
+      '<th style="width:28%">Question</th>' +
+      '<th style="width:25%">Learner\'s Answer</th>' +
+      '<th style="width:25%">Model Answer</th>' +
+      '<th style="width:40px;text-align:center;">Marks</th>' +
+      '<th style="width:90px;text-align:center;">Result</th>' +
+    '</tr></thead><tbody>' + qRows + '</tbody></table>' +
+    '<div class="footer">Mentor Me Tutor · "Turning Efforts into Achievements" · Tel: 068 557 1875 · Generated ' + date + '</div>' +
+    '</body></html>';
+
+  var blob = new Blob([html], {type:'text/html'});
+  var url  = URL.createObjectURL(blob);
+  var win  = window.open(url, '_blank');
+  if (win) {
+    win.onload = function(){ win.focus(); win.print(); };
+  }
+}
+
+function showLevel(level, btn) {
+  document.querySelectorAll(".level-panel").forEach(function(p){ p.classList.remove("active"); });
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.getElementById("panel-" + level).classList.add("active");
+  btn.classList.add("active");
+}
+
+function switchSubj(level, subj, btn) {
+  var panel = document.getElementById("panel-" + level);
+  panel.querySelectorAll(".subj-panel").forEach(function(p){ p.classList.remove("active"); });
+  panel.querySelectorAll(".subj-btn").forEach(function(b){ b.className = "subj-btn"; });
+  document.getElementById(level + "-" + subj).classList.add("active");
+  var map = { en:"s-en", math:"s-math", zu:"s-zu" };
+  btn.classList.add(map[subj]);
+}
+
+function toggleMemo(id) {
+  var memo = document.getElementById(id);
+  memo.classList.toggle("open");
+  var btn = memo.previousElementSibling.querySelector(".memo-btn");
+  btn.textContent = memo.classList.contains("open") ? "Hide Answer Memo" : "View Full Answer Memo";
+}
+
+function getFeedback(pct, mcScore, mcTotal, shortTotal) {
+  var totalMarks = mcTotal + shortTotal;
+  if (pct >= 90) {
+    return { cls:"r-excellent", emoji:"&#127881;", title:"Outstanding!", msg:"Excellent work! You have a strong command of this content. Keep pushing for perfection and review any model answers carefully to refine your knowledge.", colour:"#155724" };
+  } else if (pct >= 75) {
+    return { cls:"r-excellent", emoji:"&#128077;", title:"Well Done!", msg:"Great effort! You have a solid understanding of this subject. Focus on the questions you found difficult and compare your short answers to the model answers provided.", colour:"#155724" };
+  } else if (pct >= 60) {
+    return { cls:"r-good", emoji:"&#128218;", title:"Good Progress!", msg:"You are on the right track! Review the highlighted questions carefully. Pay attention to the model answers for short questions &#8212; they will help you understand what is expected.", colour:"#004085" };
+  } else if (pct >= 40) {
+    return { cls:"r-satisfactory", emoji:"&#9997;&#65039;", title:"Keep Practising!", msg:"You have a basic understanding but there are gaps to fill. Go through each model answer carefully, identify where you went wrong, and ask your tutor for help on the difficult topics.", colour:"#856404" };
+  } else {
+    return { cls:"r-needs-work", emoji:"&#128170;", title:"More Practice Needed", msg:"Don't give up! Everyone starts somewhere. Review your work against the model answers, focus on one topic at a time, and speak to your tutor &#8212; that's what Mentor Me Tutor is here for!", colour:"#721c24" };
+  }
+}
+
+function submitAssessment(sid) {
+  var panel = document.getElementById(sid);
+  var questions = panel.querySelectorAll(".question");
+  var mcScore = 0, mcTotal = 0, shortTotal = 0;
+
+  questions.forEach(function(q) {
+    var type = q.getAttribute("data-type");
+    var marks = parseInt(q.getAttribute("data-marks") || "1");
+    var answer = q.getAttribute("data-answer");
+
+    if (type === "mc") {
+      mcTotal += marks;
+      var inputs = q.querySelectorAll("input[type=radio]");
+      var selected = null;
+      inputs.forEach(function(inp) { if (inp.checked) selected = inp; });
+
+      q.querySelectorAll(".options li").forEach(function(li) {
+        var inp = li.querySelector("input[type=radio]");
+        li.style.pointerEvents = "none";
+        if (inp && inp.value === answer) {
+          li.classList.add("opt-correct");
+        } else if (selected && inp === selected && inp.value !== answer) {
+          li.classList.add("opt-wrong");
+        }
+      });
+
+      if (selected && selected.value === answer) {
+        mcScore += marks;
+        q.style.borderColor = "#28a745";
+      } else if (!selected) {
+        q.style.borderColor = "#ffc107";
+      } else {
+        q.style.borderColor = "#dc3545";
+      }
+    } else {
+      shortTotal += marks;
+      var modelDiv = q.querySelector(".model-answer");
+      if (modelDiv) modelDiv.classList.add("show");
+      q.style.borderColor = "#2d6a8f";
+    }
+
+    // Disable inputs
+    q.querySelectorAll("input, textarea").forEach(function(el){ el.disabled = true; });
+  });
+
+  var pct = mcTotal > 0 ? Math.round(mcScore / mcTotal * 100) : 0;
+  var fb = getFeedback(pct, mcScore, mcTotal, shortTotal);
+
+  var banner = document.getElementById("res-" + sid);
+  var pendingNote = shortTotal > 0
+    ? "<p class='result-pending'>&#128203; " + shortTotal + " mark" + (shortTotal !== 1 ? "s" : "") + " for written questions will be marked by your tutor. Compare your answers to the model answers shown above.</p>"
+    : "";
+  var autoNote = mcTotal > 0
+    ? "<div class='result-grid'><div><div class='result-score' style='color:" + fb.colour + "'>" + mcScore + "/" + mcTotal + "</div><div class='result-pct'>(" + pct + "% on auto-marked questions)</div></div><div><div style='font-size:2rem'>" + fb.emoji + "</div><div style='font-size:1.1rem;font-weight:700;color:" + fb.colour + ";margin-bottom:6px'>" + fb.title + "</div><div class='result-msg'>" + fb.msg + "</div></div></div>"
+    : "<div style='font-size:2rem'>" + fb.emoji + "</div><div style='font-size:1.1rem;font-weight:700;margin-bottom:6px'>" + fb.title + "</div><div class='result-msg'>" + fb.msg + "</div>";
+
+  banner.innerHTML = autoNote + pendingNote;
+  banner.className = "result-banner show " + fb.cls;
+  banner.scrollIntoView({ behavior:"smooth", block:"start" });
+
+  // Toggle buttons
+  var submitBtn = panel.querySelector(".submit-btn");
+  var resetBtn = document.getElementById("rst-" + sid);
+  submitBtn.disabled = true;
+  if (resetBtn) resetBtn.classList.add("show");
+  var dlBtn = document.getElementById("dl-" + sid);
+  if (dlBtn) dlBtn.classList.add("show");
+  var csvBtn = document.getElementById("csv-" + sid);
+  if (csvBtn) csvBtn.classList.add("show");
+}
+
+function resetAssessment(sid) {
+  var panel = document.getElementById(sid);
+
+  // Re-enable inputs and clear values
+  panel.querySelectorAll("input[type=radio]").forEach(function(inp){
+    inp.checked = false; inp.disabled = false;
+  });
+  panel.querySelectorAll("input[type=text], textarea").forEach(function(inp){
+    inp.value = ""; inp.disabled = false;
+  });
+
+  // Remove highlights
+  panel.querySelectorAll(".options li").forEach(function(li){
+    li.classList.remove("opt-correct","opt-wrong","opt-missed");
+    li.style.pointerEvents = "";
+  });
+  panel.querySelectorAll(".question").forEach(function(q){
+    q.style.borderColor = "";
+  });
+
+  // Hide model answers
+  panel.querySelectorAll(".model-answer").forEach(function(m){
+    m.classList.remove("show");
+  });
+
+  // Hide result banner
+  var banner = document.getElementById("res-" + sid);
+  banner.className = "result-banner";
+  banner.innerHTML = "";
+
+  // Reset buttons
+  panel.querySelector(".submit-btn").disabled = false;
+  var resetBtn = document.getElementById("rst-" + sid);
+  if (resetBtn) resetBtn.classList.remove("show");
+  var dlBtn = document.getElementById("dl-" + sid);
+  if (dlBtn) dlBtn.classList.remove("show");
+  var csvBtn = document.getElementById("csv-" + sid);
+  if (csvBtn) csvBtn.classList.remove("show");
+}
+</script>
+</body>
+</html>
