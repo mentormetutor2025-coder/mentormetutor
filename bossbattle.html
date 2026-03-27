@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Boss Battle Maths | Mentor Me Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════════ */
+:root {
+  --navy:#1a2e45; --teal:#2d6a8f; --orange:#f07c1e;
+  --red:#e74c3c; --green:#27ae60; --yellow:#f1c40f;
+  --purple:#8e44ad; --blue:#3498db; --dark:#0d1b2a;
+  --player-color:#27ae60; --boss-color:#e74c3c;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Nunito',sans-serif;
+  background:var(--dark);
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════════ */
+.top-bar {
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(8px);
+  padding:10px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:relative; z-index:10;
+}
+.top-bar-logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.top-bar-logo img { height:32px; border-radius:8px; }
+.top-bar-logo span { color:#fff; font-size:.9rem; font-weight:800; }
+.top-bar-back {
+  color:rgba(255,255,255,.6); text-decoration:none;
+  font-size:.8rem; font-weight:700;
+  display:flex; align-items:center; gap:5px; transition:color .2s;
+}
+.top-bar-back:hover { color:var(--orange); }
+
+/* ══════════════════════════════════════════
+   SCREEN SYSTEM
+══════════════════════════════════════════ */
+.screen { display:none; }
+.screen.active { display:block; animation:fadeUp .4s ease; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   STARS BACKGROUND
+══════════════════════════════════════════ */
+.stars-bg {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(ellipse at top, #1a1a4e 0%, #0d1b2a 60%);
+  overflow:hidden;
+}
+.stars-bg::before, .stars-bg::after {
+  content:''; position:absolute; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 60%, rgba(255,255,255,.4) 0%, transparent 100%),
+    radial-gradient(2px 2px at 10% 80%, rgba(255,255,255,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 85%, rgba(255,255,255,.4) 0%, transparent 100%),
+    radial-gradient(2px 2px at 55% 40%, rgba(255,255,255,.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 35%, rgba(255,255,255,.4) 0%, transparent 100%);
+  animation: twinkle 4s infinite alternate;
+}
+.stars-bg::after { animation-delay:2s; opacity:.5; }
+@keyframes twinkle { from{opacity:.5} to{opacity:1} }
+
+/* ══════════════════════════════════════════
+   START SCREEN
+══════════════════════════════════════════ */
+#screen-start {
+  position:relative; z-index:2;
+  max-width:680px; margin:0 auto;
+  padding:30px 20px 60px; text-align:center;
+}
+.game-logo {
+  font-family:'Bangers',cursive;
+  font-size:clamp(2.4rem,7vw,4.5rem);
+  line-height:1; letter-spacing:.04em;
+  margin-bottom:6px;
+  background:linear-gradient(135deg, #f1c40f, #f07c1e, #e74c3c);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 4px 12px rgba(241,196,15,.3));
+}
+.game-logo-sub {
+  font-family:'Bangers',cursive;
+  font-size:clamp(1rem,3vw,1.6rem);
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.7);
+  margin-bottom:6px;
+}
+.game-tagline { color:rgba(255,255,255,.5); font-size:.9rem; margin-bottom:28px; }
+
+/* Boss preview */
+.boss-preview {
+  width:140px; height:140px; margin:0 auto 24px;
+  position:relative;
+}
+.boss-sprite {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:5rem;
+  animation:bossFloat 2.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(231,76,60,.5));
+}
+@keyframes bossFloat {
+  0%,100% { transform:translateY(0) scale(1); }
+  50%      { transform:translateY(-12px) scale(1.05); }
+}
+
+/* Difficulty cards */
+.diff-label { color:rgba(255,255,255,.5); font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.16em; margin-bottom:14px; }
+.diff-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:26px; }
+.diff-card {
+  background:rgba(255,255,255,.06);
+  border:2px solid rgba(255,255,255,.1);
+  border-radius:16px; padding:16px 10px;
+  cursor:pointer; transition:all .2s; text-align:center;
+}
+.diff-card:hover { transform:translateY(-4px); background:rgba(255,255,255,.12); }
+.diff-card.selected.easy  { border-color:var(--green);  background:rgba(39,174,96,.15); }
+.diff-card.selected.medium{ border-color:var(--yellow); background:rgba(241,196,15,.12); }
+.diff-card.selected.hard  { border-color:var(--red);    background:rgba(231,76,60,.15); }
+.diff-icon { font-size:1.8rem; margin-bottom:6px; }
+.diff-name { font-weight:900; font-size:.9rem; color:#fff; margin-bottom:3px; }
+.diff-grades { font-size:.72rem; color:rgba(255,255,255,.5); }
+
+/* How to play */
+.how-box {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:16px 20px;
+  margin-bottom:24px; text-align:left;
+}
+.how-box h3 { color:var(--yellow); font-size:.8rem; text-transform:uppercase; letter-spacing:.12em; margin-bottom:10px; }
+.how-box ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+.how-box li { color:rgba(255,255,255,.7); font-size:.84rem; display:flex; gap:8px; }
+.how-box li::before { content:'⚔️'; flex-shrink:0; }
+
+/* Play button */
+.play-btn {
+  background:linear-gradient(135deg, #e74c3c, #c0392b);
+  color:#fff; border:none;
+  padding:16px 52px; border-radius:50px;
+  font-family:'Bangers',cursive; font-size:1.5rem; letter-spacing:.1em;
+  cursor:pointer; transition:all .2s;
+  box-shadow:0 8px 28px rgba(231,76,60,.4);
+  display:inline-flex; align-items:center; gap:10px;
+}
+.play-btn:hover { transform:translateY(-4px); box-shadow:0 14px 40px rgba(231,76,60,.5); }
+.play-btn:disabled { background:#444; box-shadow:none; cursor:not-allowed; transform:none; }
+
+/* ══════════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════════ */
+#screen-game {
+  position:relative; z-index:2;
+  max-width:820px; margin:0 auto;
+  padding:14px 14px 50px;
+}
+
+/* Top HUD */
+.hud-top {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:14px; flex-wrap:wrap;
+}
+.hud-level {
+  font-family:'Bangers',cursive; font-size:1.1rem; letter-spacing:.08em;
+  color:var(--yellow);
+  background:rgba(241,196,15,.12); border:1px solid rgba(241,196,15,.25);
+  border-radius:50px; padding:5px 16px;
+}
+.hud-score {
+  font-weight:900; font-size:.95rem; color:#fff;
+  background:rgba(255,255,255,.08); border-radius:50px; padding:5px 16px;
+}
+.hud-score span { color:var(--yellow); }
+.hud-combo {
+  font-weight:900; font-size:.88rem;
+  background:rgba(255,165,0,.15); border:1px solid rgba(255,165,0,.3);
+  border-radius:50px; padding:5px 14px; color:#ffa500;
+  transition:all .3s; opacity:0;
+}
+.hud-combo.show { opacity:1; }
+
+/* Arena */
+.arena {
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:22px; padding:20px;
+  margin-bottom:14px;
+  position:relative; overflow:hidden;
+}
+.arena::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 0%, rgba(231,76,60,.08) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* Health bars row */
+.health-row {
+  display:grid; grid-template-columns:1fr auto 1fr;
+  gap:12px; align-items:center; margin-bottom:20px;
+}
+.health-section { display:flex; flex-direction:column; gap:5px; }
+.health-section.boss-section { text-align:right; }
+.fighter-name {
+  font-weight:900; font-size:.78rem; text-transform:uppercase;
+  letter-spacing:.1em; opacity:.7;
+}
+.health-bar-wrap {
+  background:rgba(255,255,255,.1);
+  border-radius:50px; height:14px; overflow:hidden;
+  position:relative;
+}
+.health-bar-fill {
+  height:100%; border-radius:50px;
+  transition:width .4s ease; position:relative;
+}
+.health-bar-fill.player-fill { background:linear-gradient(90deg, #27ae60, #2ecc71); }
+.health-bar-fill.boss-fill   { background:linear-gradient(90deg, #e74c3c, #ff6b6b); }
+.health-numbers { font-size:.72rem; font-weight:700; opacity:.65; }
+.vs-badge {
+  font-family:'Bangers',cursive; font-size:1.4rem; letter-spacing:.08em;
+  color:rgba(255,255,255,.4); text-align:center;
+}
+
+/* Fighters display */
+.fighters-row {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:20px; margin-bottom:20px; align-items:end;
+}
+.fighter-container { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.fighter-sprite {
+  font-size:clamp(3rem,8vw,5.5rem);
+  transition:all .2s;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.4));
+  line-height:1;
+}
+.boss-sprite-game {
+  animation:bossFloat 2s ease-in-out infinite;
+  filter:drop-shadow(0 0 16px rgba(231,76,60,.4));
+}
+.player-sprite-game {
+  animation:playerIdle 3s ease-in-out infinite;
+}
+@keyframes playerIdle {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-6px); }
+}
+/* Hit animations */
+.boss-hit { animation:bossHitAnim .5s ease !important; }
+.player-hit { animation:playerHitAnim .5s ease !important; }
+@keyframes bossHitAnim {
+  0%   { transform:translateX(0) scale(1); filter:brightness(3) drop-shadow(0 0 20px #fff); }
+  25%  { transform:translateX(-15px) scale(0.9); }
+  75%  { transform:translateX(8px) scale(0.95); }
+  100% { transform:translateX(0) scale(1); filter:drop-shadow(0 0 16px rgba(231,76,60,.4)); }
+}
+@keyframes playerHitAnim {
+  0%   { transform:translateX(0); filter:brightness(3) drop-shadow(0 0 16px #f00); }
+  25%  { transform:translateX(12px) scale(0.92); }
+  75%  { transform:translateX(-8px); }
+  100% { transform:translateX(0); filter:none; }
+}
+.fighter-label {
+  font-size:.72rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.1em; opacity:.55;
+}
+
+/* Battle message */
+.battle-msg {
+  text-align:center; font-weight:900; font-size:1rem;
+  color:rgba(255,255,255,.6); min-height:24px;
+  transition:all .3s;
+}
+.battle-msg.good { color:#2ecc71; }
+.battle-msg.bad  { color:#e74c3c; }
+
+/* ══ QUESTION PANEL ══ */
+.question-panel {
+  background:rgba(255,255,255,.96);
+  border-radius:20px; padding:22px;
+  box-shadow:0 8px 40px rgba(0,0,0,.3);
+}
+
+/* Timer bar */
+.timer-bar-wrap {
+  background:#e8ecf0; border-radius:50px;
+  height:10px; overflow:hidden; margin-bottom:16px;
+}
+.timer-bar-fill {
+  height:100%; border-radius:50px;
+  background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));
+  transition:width .2s linear;
+}
+
+/* Question */
+.q-text {
+  font-family:'Bangers',cursive;
+  font-size:clamp(2rem,6vw,3.4rem);
+  letter-spacing:.04em; color:var(--navy);
+  text-align:center; margin-bottom:14px;
+}
+.q-op-badge {
+  display:inline-block; border-radius:50px;
+  padding:2px 12px; font-size:.7rem;
+  font-weight:800; text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:10px;
+}
+
+/* Answer options */
+.answer-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.answer-btn {
+  background:#f0f4f8; border:2px solid #dde3f0;
+  border-radius:14px; padding:14px 10px;
+  font-family:'Bangers',cursive; font-size:1.5rem;
+  letter-spacing:.04em; color:var(--navy);
+  cursor:pointer; transition:all .18s; text-align:center;
+}
+.answer-btn:hover:not(:disabled) {
+  background:#e0e8f5; border-color:#b8c5d8;
+  transform:scale(1.04);
+}
+.answer-btn.correct-flash {
+  background:#d4edda; border-color:var(--green); color:var(--green);
+  animation:correctPulse .4s ease;
+}
+.answer-btn.wrong-flash {
+  background:#f8d7da; border-color:var(--red); color:var(--red);
+  animation:wrongShake .4s ease;
+}
+.answer-btn.reveal-correct {
+  background:#d4edda; border-color:var(--green); color:var(--green);
+}
+.answer-btn:disabled { cursor:not-allowed; }
+@keyframes correctPulse {
+  0%,100% { transform:scale(1); }
+  50%      { transform:scale(1.08); }
+}
+@keyframes wrongShake {
+  0%,100% { transform:translateX(0); }
+  25%      { transform:translateX(-6px); }
+  75%      { transform:translateX(6px); }
+}
+
+/* Typed input row */
+.typed-row {
+  display:flex; gap:8px; margin-top:12px; align-items:center; justify-content:center;
+}
+.typed-input {
+  width:90px; padding:10px 14px;
+  border:2px solid #dde3f0; border-radius:12px;
+  font-family:'Bangers',cursive; font-size:1.5rem;
+  color:var(--navy); text-align:center; outline:none;
+  transition:border-color .2s;
+}
+.typed-input:focus { border-color:var(--teal); }
+.check-btn {
+  background:var(--navy); color:#fff; border:none;
+  padding:10px 22px; border-radius:50px;
+  font-family:'Nunito',sans-serif; font-size:.9rem; font-weight:900;
+  cursor:pointer; transition:all .2s;
+}
+.check-btn:hover { background:#253f5c; }
+.check-btn:disabled { background:#aaa; cursor:not-allowed; }
+
+/* Damage floating numbers */
+.dmg-float {
+  position:fixed; pointer-events:none; z-index:100;
+  font-family:'Bangers',cursive; font-size:2rem;
+  font-weight:900; letter-spacing:.05em;
+  animation:floatUp 1.2s ease forwards;
+}
+@keyframes floatUp {
+  0%   { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(-80px) scale(0.6); }
+}
+
+/* ══════════════════════════════════════════
+   VICTORY / GAME OVER SCREENS
+══════════════════════════════════════════ */
+#screen-victory, #screen-gameover {
+  position:relative; z-index:2;
+  max-width:580px; margin:0 auto;
+  padding:32px 20px 60px; text-align:center;
+}
+.end-title {
+  font-family:'Bangers',cursive;
+  font-size:clamp(2.5rem,8vw,5rem);
+  letter-spacing:.06em; line-height:1;
+  margin-bottom:8px;
+}
+.end-title.victory { background:linear-gradient(135deg,#f1c40f,#f07c1e); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 4px 16px rgba(241,196,15,.4)); }
+.end-title.defeat  { background:linear-gradient(135deg,#e74c3c,#922b21); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 4px 16px rgba(231,76,60,.4)); }
+.end-emoji { font-size:5rem; margin-bottom:12px; display:block; animation:bossFloat 2s ease-in-out infinite; }
+.end-subtitle { color:rgba(255,255,255,.6); font-size:.95rem; margin-bottom:24px; }
+.end-card {
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px; padding:24px; margin-bottom:22px;
+}
+.end-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+.end-stat { text-align:center; }
+.end-stat-val { font-family:'Bangers',cursive; font-size:2.2rem; letter-spacing:.04em; }
+.end-stat-val.gold  { color:var(--yellow); }
+.end-stat-val.green { color:var(--green); }
+.end-stat-val.red   { color:var(--red); }
+.end-stat-lbl { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.5); margin-top:2px; }
+.end-boss-name { font-family:'Bangers',cursive; font-size:1.2rem; letter-spacing:.08em; color:rgba(255,255,255,.7); }
+.end-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.end-btn-play {
+  background:linear-gradient(135deg,#e74c3c,#c0392b);
+  color:#fff; border:none; padding:14px 34px; border-radius:50px;
+  font-family:'Bangers',cursive; font-size:1.3rem; letter-spacing:.08em;
+  cursor:pointer; transition:all .2s;
+  box-shadow:0 6px 20px rgba(231,76,60,.4);
+}
+.end-btn-play:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(231,76,60,.5); }
+.end-btn-home {
+  background:rgba(255,255,255,.1); color:#fff;
+  border:1px solid rgba(255,255,255,.2);
+  padding:14px 26px; border-radius:50px;
+  font-family:'Nunito',sans-serif; font-size:.9rem; font-weight:700;
+  cursor:pointer; transition:all .2s;
+}
+.end-btn-home:hover { background:rgba(255,255,255,.18); }
+
+/* Streak badge on end screen */
+.streak-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(255,165,0,.15); border:1px solid rgba(255,165,0,.3);
+  border-radius:50px; padding:6px 18px;
+  color:#ffa500; font-weight:800; font-size:.88rem;
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:500px) {
+  .fighters-row { gap:10px; }
+  .fighter-sprite { font-size:3rem; }
+  .q-text { font-size:1.8rem; }
+  .answer-btn { font-size:1.2rem; padding:12px 8px; }
+  .diff-cards { grid-template-columns:1fr; gap:8px; }
+  .end-stats { grid-template-columns:1fr; }
+  .health-row { grid-template-columns:1fr auto 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Stars background -->
+<div class="stars-bg"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="worksheets.html" class="top-bar-logo">
+    <img src="logo.png" alt="MMT" onerror="this.style.display='none'"/>
+    <span>Mentor Me Tutor</span>
+  </a>
+  <a href="worksheets.html" class="top-bar-back">← Back to Worksheets</a>
+</div>
+
+<!-- ══════════════════════════════════
+     START SCREEN
+════════════════════════════════════ -->
+<div id="screen-start" class="screen active">
+  <div class="game-logo">BOSS BATTLE</div>
+  <div class="game-logo-sub">⚔️ MATHS ⚔️</div>
+  <p class="game-tagline">Defeat the boss by solving maths problems — faster is stronger!</p>
+
+  <div class="boss-preview">
+    <div class="boss-sprite" id="previewBoss">👾</div>
+  </div>
+
+  <div class="diff-label">Choose your difficulty</div>
+  <div class="diff-cards">
+    <div class="diff-card easy" onclick="selectDiff('easy',this)">
+      <div class="diff-icon">🟢</div>
+      <div class="diff-name">Easy</div>
+      <div class="diff-grades">Grade 4–5 · Numbers 1–10</div>
+    </div>
+    <div class="diff-card medium" onclick="selectDiff('medium',this)">
+      <div class="diff-icon">🟡</div>
+      <div class="diff-name">Medium</div>
+      <div class="diff-grades">Grade 6–7 · Numbers 1–20</div>
+    </div>
+    <div class="diff-card hard" onclick="selectDiff('hard',this)">
+      <div class="diff-icon">🔴</div>
+      <div class="diff-name">Hard</div>
+      <div class="diff-grades">Grade 8–12 · Advanced</div>
+    </div>
+  </div>
+
+  <div class="how-box">
+    <h3>⚔️ How to Battle</h3>
+    <ul>
+      <li>Solve the maths question before the timer runs out</li>
+      <li>Correct answer → Deal damage to the boss</li>
+      <li>Wrong answer or timeout → Boss hits you instead</li>
+      <li>Build a streak for bonus damage (COMBO!)</li>
+      <li>Defeat the boss to advance to the next level</li>
+    </ul>
+  </div>
+
+  <button class="play-btn" id="startBtn" onclick="startGame()" disabled>
+    ⚔️ BATTLE!
+  </button>
+</div>
+
+<!-- ══════════════════════════════════
+     GAME SCREEN
+════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <!-- HUD Top -->
+  <div class="hud-top">
+    <div class="hud-level" id="levelBadge">Level 1</div>
+    <div class="hud-combo" id="comboBadge">🔥 COMBO ×1</div>
+    <div class="hud-score">Score: <span id="scoreVal">0</span></div>
+  </div>
+
+  <!-- Arena -->
+  <div class="arena">
+    <!-- Health bars -->
+    <div class="health-row">
+      <div class="health-section">
+        <div class="fighter-name">⚔️ You</div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-fill player-fill" id="playerBar" style="width:100%"></div>
+        </div>
+        <div class="health-numbers" id="playerHPText">100 / 100</div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="health-section boss-section">
+        <div class="fighter-name">👾 Boss</div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-fill boss-fill" id="bossBar" style="width:100%"></div>
+        </div>
+        <div class="health-numbers" id="bossHPText">100 / 100</div>
+      </div>
+    </div>
+
+    <!-- Fighters -->
+    <div class="fighters-row">
+      <div class="fighter-container">
+        <div class="fighter-sprite player-sprite-game" id="playerSprite">🧑‍🎓</div>
+        <div class="fighter-label">You</div>
+      </div>
+      <div class="fighter-container">
+        <div class="fighter-sprite boss-sprite-game" id="bossSprite">👾</div>
+        <div class="fighter-label" id="bossNameLabel">Boss</div>
+      </div>
+    </div>
+
+    <!-- Battle message -->
+    <div class="battle-msg" id="battleMsg">Solve the question to attack!</div>
+  </div>
+
+  <!-- Question Panel -->
+  <div class="question-panel">
+    <div class="timer-bar-wrap">
+      <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
+    </div>
+    <div style="text-align:center;margin-bottom:8px;">
+      <span class="q-op-badge" id="opBadge"></span>
+    </div>
+    <div class="q-text" id="qDisplay">7 + 5 = ?</div>
+    <div class="answer-grid" id="answerGrid"></div>
+    <div class="typed-row">
+      <input type="number" class="typed-input" id="typedInput" placeholder="?" autocomplete="off"/>
+      <button class="check-btn" id="checkBtn" onclick="submitTyped()">⚔️ Attack!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     VICTORY SCREEN
+════════════════════════════════════ -->
+<div id="screen-victory" class="screen">
+  <div class="end-title victory" id="victoryTitle">VICTORY!</div>
+  <span class="end-emoji" id="victoryEmoji">🏆</span>
+  <p class="end-subtitle" id="victorySubtitle">You defeated the boss!</p>
+  <div class="end-card">
+    <div class="end-boss-name" id="victoryBossName"></div>
+    <div class="end-stats">
+      <div class="end-stat">
+        <div class="end-stat-val gold" id="vScore">0</div>
+        <div class="end-stat-lbl">Score</div>
+      </div>
+      <div class="end-stat">
+        <div class="end-stat-val green" id="vCorrect">0</div>
+        <div class="end-stat-lbl">✅ Correct</div>
+      </div>
+      <div class="end-stat">
+        <div class="end-stat-val red" id="vWrong">0</div>
+        <div class="end-stat-lbl">❌ Wrong</div>
+      </div>
+    </div>
+    <div class="streak-badge" id="vStreakBadge">🔥 Best Streak: 0</div>
+  </div>
+  <div class="end-btns">
+    <button class="end-btn-play" onclick="nextLevel()">⚔️ NEXT BOSS</button>
+    <button class="end-btn-home" onclick="goHome()">🏠 Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     GAME OVER SCREEN
+════════════════════════════════════ -->
+<div id="screen-gameover" class="screen">
+  <div class="end-title defeat">DEFEAT!</div>
+  <span class="end-emoji">💀</span>
+  <p class="end-subtitle">The boss was too powerful this time...</p>
+  <div class="end-card">
+    <div class="end-boss-name" id="goatBossName"></div>
+    <div class="end-stats">
+      <div class="end-stat">
+        <div class="end-stat-val gold" id="goScore">0</div>
+        <div class="end-stat-lbl">Score</div>
+      </div>
+      <div class="end-stat">
+        <div class="end-stat-val green" id="goCorrect">0</div>
+        <div class="end-stat-lbl">✅ Correct</div>
+      </div>
+      <div class="end-stat">
+        <div class="end-stat-val red" id="goWrong">0</div>
+        <div class="end-stat-lbl">❌ Wrong</div>
+      </div>
+    </div>
+    <div class="streak-badge" id="goStreakBadge">🔥 Best Streak: 0</div>
+  </div>
+  <div class="end-btns">
+    <button class="end-btn-play" onclick="restartGame()">⚔️ TRY AGAIN</button>
+    <button class="end-btn-home" onclick="goHome()">🏠 Home</button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   BOSS DATA
+════════════════════════════════════════════════ */
+const BOSSES = [
+  { name:'Goblin Guard',    emoji:'👺', color:'#27ae60', hp:60,  atk:12, timeLimit:10 },
+  { name:'Skeleton Knight', emoji:'💀', color:'#3498db', hp:80,  atk:15, timeLimit:9  },
+  { name:'Fire Dragon',     emoji:'🐉', color:'#e74c3c', hp:100, atk:18, timeLimit:8  },
+  { name:'Dark Wizard',     emoji:'🧙', color:'#8e44ad', hp:120, atk:22, timeLimit:7  },
+  { name:'Shadow Titan',    emoji:'👤', color:'#2c3e50', hp:150, atk:28, timeLimit:6  },
+  { name:'FINAL BOSS',      emoji:'👿', color:'#e74c3c', hp:200, atk:35, timeLimit:5  },
+];
+
+/* ════════════════════════════════════════════════
+   GAME STATE
+════════════════════════════════════════════════ */
+const G = {
+  diff:'easy', level:0, score:0,
+  playerHP:100, playerMaxHP:100,
+  bossHP:100,   bossMaxHP:100,
+  correct:0, wrong:0, streak:0, bestStreak:0,
+  timerInterval:null, timeLeft:10, totalTime:10,
+  questionAnswered:false, currentQ:null,
+};
+
+/* ════════════════════════════════════════════════
+   SOUND ENGINE
+════════════════════════════════════════════════ */
+const ctx = window.AudioContext ? new (window.AudioContext||window.webkitAudioContext)() : null;
+function playTone(freq, dur, type='square', vol=0.15) {
+  if (!ctx) return;
+  try {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+function playCorrect() {
+  playTone(523,.1,'sine',.2); setTimeout(()=>playTone(784,.15,'sine',.2),80);
+}
+function playWrong() {
+  playTone(200,.15,'sawtooth',.15); setTimeout(()=>playTone(160,.2,'sawtooth',.15),100);
+}
+function playVictory() {
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.25,'sine',.2),i*120));
+}
+function playDefeat() {
+  [400,350,280,220].forEach((f,i)=>setTimeout(()=>playTone(f,.3,'sawtooth',.15),i*140));
+}
+function playAttack() { playTone(300,.08,'square',.12); }
+
+/* ════════════════════════════════════════════════
+   QUESTION GENERATOR
+════════════════════════════════════════════════ */
+function rand(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+
+function getRange() {
+  if (G.diff==='easy')   return {min:1,max:10};
+  if (G.diff==='medium') return {min:1,max:20};
+  return {min:2,max:30};
+}
+
+function chooseOp() {
+  const ops = ['+','-','×','÷'];
+  if (G.diff==='easy')   return ops[rand(0,1)];  // add/sub only at easy early
+  if (G.diff==='medium') return ops[rand(0,2)];  // add/sub/mul
+  return ops[rand(0,3)];
+}
+
+function genQ() {
+  const {min,max} = getRange();
+  let a, b, ans, display, op = chooseOp();
+
+  // Level adjustments — harder as levels increase
+  const levelBonus = Math.min(G.level * 2, 10);
+
+  switch(op) {
+    case '+':
+      a = rand(min, max + levelBonus);
+      b = rand(min, max + levelBonus);
+      ans = a + b;
+      display = `${a} + ${b} = ?`;
+      break;
+    case '-':
+      a = rand(min + 2, max + levelBonus);
+      b = rand(min, a - 1);
+      ans = a - b;
+      display = `${a} − ${b} = ?`;
+      break;
+    case '×':
+      a = rand(2, Math.min(max, 12));
+      b = rand(2, Math.min(max, 12));
+      ans = a * b;
+      display = `${a} × ${b} = ?`;
+      break;
+    case '÷':
+      b = rand(2, G.diff==='hard' ? 12 : 6);
+      const q = rand(2, G.diff==='hard' ? 12 : 6);
+      a = b * q;
+      ans = q;
+      display = `${a} ÷ ${b} = ?`;
+      break;
+  }
+
+  // Wrong options
+  const wrongs = new Set();
+  while (wrongs.size < 3) {
+    let w = ans + rand(-6, 6);
+    if (w !== ans && w > 0) wrongs.add(w);
+  }
+  const options = [...wrongs, ans].sort(()=>Math.random()-0.5);
+
+  const opColors = {'+':'#27ae60','-':'#e74c3c','×':'#8e44ad','÷':'#f07c1e'};
+  const opNames  = {'+':'Addition','-':'Subtraction','×':'Multiplication','÷':'Division'};
+
+  return { a, b, ans, display, op, options, opColor:opColors[op], opName:opNames[op] };
+}
+
+/* ════════════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════════════ */
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateHealthBars() {
+  const pb = Math.max(0, (G.playerHP/G.playerMaxHP)*100);
+  const bb = Math.max(0, (G.bossHP/G.bossMaxHP)*100);
+  document.getElementById('playerBar').style.width = pb+'%';
+  document.getElementById('bossBar').style.width   = bb+'%';
+  document.getElementById('playerHPText').textContent = `${Math.max(0,G.playerHP)} / ${G.playerMaxHP}`;
+  document.getElementById('bossHPText').textContent   = `${Math.max(0,G.bossHP)} / ${G.bossMaxHP}`;
+
+  // Change player bar color when low
+  const pFill = document.getElementById('playerBar');
+  if (pb < 25) pFill.style.background = 'linear-gradient(90deg,#e74c3c,#ff6b6b)';
+  else if (pb < 50) pFill.style.background = 'linear-gradient(90deg,#f39c12,#f1c40f)';
+  else pFill.style.background = 'linear-gradient(90deg,#27ae60,#2ecc71)';
+}
+
+function showBattleMsg(msg, type='') {
+  const el = document.getElementById('battleMsg');
+  el.textContent = msg;
+  el.className = 'battle-msg' + (type ? ' '+type : '');
+}
+
+function spawnDmg(text, color, targetId) {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  const rect = target.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'dmg-float';
+  el.textContent = text;
+  el.style.cssText = `color:${color};left:${rect.left+rect.width/2-20}px;top:${rect.top+window.scrollY}px;`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1200);
+}
+
+function hitSprite(spriteId, className) {
+  const el = document.getElementById(spriteId);
+  if (!el) return;
+  el.classList.remove('boss-hit','player-hit');
+  void el.offsetWidth; // reflow
+  el.classList.add(className);
+  setTimeout(()=>el.classList.remove(className), 500);
+}
+
+/* ════════════════════════════════════════════════
+   COMBO / SCORE
+════════════════════════════════════════════════ */
+function updateCombo() {
+  const cb = document.getElementById('comboBadge');
+  if (G.streak >= 2) {
+    cb.textContent = `🔥 COMBO ×${G.streak}`;
+    cb.classList.add('show');
+  } else {
+    cb.classList.remove('show');
+  }
+  document.getElementById('scoreVal').textContent = G.score;
+}
+
+/* ════════════════════════════════════════════════
+   TIMER
+════════════════════════════════════════════════ */
+function startTimer() {
+  const boss = BOSSES[Math.min(G.level, BOSSES.length-1)];
+  G.totalTime = boss.timeLimit;
+  G.timeLeft  = G.totalTime;
+  clearInterval(G.timerInterval);
+  updateTimerBar();
+  G.timerInterval = setInterval(()=>{
+    G.timeLeft -= 0.1;
+    updateTimerBar();
+    if (G.timeLeft <= 0) {
+      clearInterval(G.timerInterval);
+      if (!G.questionAnswered) bossAttacks('Too slow!');
+    }
+  }, 100);
+}
+
+function updateTimerBar() {
+  const pct = Math.max(0, (G.timeLeft / G.totalTime)*100);
+  document.getElementById('timerBar').style.width = pct+'%';
+}
+
+function stopTimer() { clearInterval(G.timerInterval); }
+
+/* ════════════════════════════════════════════════
+   GAME FLOW
+════════════════════════════════════════════════ */
+function selectDiff(diff, el) {
+  G.diff = diff;
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const emojis = {easy:'👺',medium:'💀',hard:'🐉'};
+  document.getElementById('previewBoss').textContent = emojis[diff];
+  document.getElementById('startBtn').disabled = false;
+}
+
+function startGame() {
+  G.level=0; G.score=0; G.correct=0; G.wrong=0; G.streak=0; G.bestStreak=0;
+  loadLevel();
+}
+
+function loadLevel() {
+  const boss = BOSSES[Math.min(G.level, BOSSES.length-1)];
+
+  // HP scaling
+  G.playerMaxHP = 100; G.playerHP = 100;
+  G.bossMaxHP   = boss.hp + G.level*10;
+  G.bossHP      = G.bossMaxHP;
+
+  // UI
+  document.getElementById('levelBadge').textContent = `Level ${G.level+1}`;
+  document.getElementById('bossSprite').textContent  = boss.emoji;
+  document.getElementById('bossNameLabel').textContent = boss.name;
+
+  switchScreen('screen-game');
+  updateHealthBars();
+  loadQuestion();
+}
+
+function loadQuestion() {
+  G.questionAnswered = false;
+  G.currentQ = genQ();
+  const q = G.currentQ;
+
+  // Operation badge
+  const badge = document.getElementById('opBadge');
+  badge.textContent = q.opName;
+  badge.style.cssText = `background:${q.opColor}20;color:${q.opColor};border:1px solid ${q.opColor}40;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:2px 12px;border-radius:50px;`;
+
+  // Question text
+  document.getElementById('qDisplay').textContent = q.display;
+
+  // MCQ buttons
+  const grid = document.getElementById('answerGrid');
+  grid.innerHTML = '';
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = opt;
+    btn.onclick = ()=>checkAnswer(opt, btn);
+    grid.appendChild(btn);
+  });
+
+  // Typed input
+  const inp = document.getElementById('typedInput');
+  inp.value = ''; inp.disabled = false;
+  document.getElementById('checkBtn').disabled = false;
+
+  showBattleMsg('Solve the question to attack!');
+  startTimer();
+}
+
+/* ════════════════════════════════════════════════
+   ANSWER CHECKING
+════════════════════════════════════════════════ */
+function checkAnswer(val, clickedBtn) {
+  if (G.questionAnswered) return;
+  G.questionAnswered = true;
+  stopTimer();
+
+  const correct = val === G.currentQ.ans;
+
+  // Disable all buttons & input
+  document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);
+  document.getElementById('typedInput').disabled  = true;
+  document.getElementById('checkBtn').disabled    = true;
+
+  // Highlight correct answer
+  document.querySelectorAll('.answer-btn').forEach(b=>{
+    if (parseInt(b.textContent)===G.currentQ.ans) b.classList.add('reveal-correct');
+  });
+
+  if (correct) {
+    if (clickedBtn) clickedBtn.classList.add('correct-flash');
+    playerAttacks();
+  } else {
+    if (clickedBtn) clickedBtn.classList.add('wrong-flash');
+    bossAttacks('Wrong answer!');
+  }
+}
+
+function submitTyped() {
+  const val = parseInt(document.getElementById('typedInput').value);
+  if (isNaN(val)) return;
+  checkAnswer(val, null);
+}
+
+// Enter key on typed input
+document.getElementById('typedInput').addEventListener('keydown',e=>{
+  if (e.key==='Enter' && !G.questionAnswered) submitTyped();
+});
+
+/* ════════════════════════════════════════════════
+   COMBAT
+════════════════════════════════════════════════ */
+function playerAttacks() {
+  G.correct++;
+  G.streak++;
+  if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+
+  // Base damage + combo bonus + streak bonus
+  const baseDmg = G.diff==='easy' ? 20 : G.diff==='medium' ? 15 : 12;
+  const comboDmg = Math.floor((G.streak-1) * 4);
+  const totalDmg = baseDmg + comboDmg;
+
+  G.bossHP -= totalDmg;
+  G.score  += 10 + comboDmg;
+
+  playCorrect();
+  hitSprite('bossSprite','boss-hit');
+  spawnDmg(`-${totalDmg}`, '#e74c3c', 'bossSprite');
+
+  const msgs = ['Critical hit! 💥','Great shot! ⚔️','Nice work! 🌟','COMBO BONUS! 🔥','Deadly strike! ⚡'];
+  showBattleMsg(G.streak>=3 ? msgs[4] : G.streak>=2 ? msgs[3] : msgs[Math.floor(Math.random()*3)], 'good');
+
+  updateHealthBars();
+  updateCombo();
+
+  if (G.bossHP <= 0) { setTimeout(endVictory, 700); return; }
+  setTimeout(loadQuestion, 900);
+}
+
+function bossAttacks(reason) {
+  G.wrong++;
+  G.streak = 0;
+  const boss = BOSSES[Math.min(G.level, BOSSES.length-1)];
+  const dmg  = boss.atk;
+
+  G.playerHP -= dmg;
+  G.questionAnswered = true;
+
+  playWrong();
+  playAttack();
+  hitSprite('playerSprite','player-hit');
+  spawnDmg(`-${dmg}`, '#e74c3c', 'playerSprite');
+  showBattleMsg(`${reason} The boss attacks! 💢`, 'bad');
+
+  updateHealthBars();
+  updateCombo();
+
+  if (G.playerHP <= 0) { setTimeout(endDefeat, 700); return; }
+  setTimeout(loadQuestion, 1000);
+}
+
+/* ════════════════════════════════════════════════
+   END STATES
+════════════════════════════════════════════════ */
+function endVictory() {
+  const boss = BOSSES[Math.min(G.level, BOSSES.length-1)];
+  G.score += 50 + G.level*20; // boss kill bonus
+  playVictory();
+
+  const hasNext = G.level < BOSSES.length-1;
+  document.getElementById('victoryTitle').textContent = hasNext ? 'BOSS DEFEATED!' : '🎉 GAME COMPLETE!';
+  document.getElementById('victoryEmoji').textContent = hasNext ? '🏆' : '👑';
+  document.getElementById('victorySubtitle').textContent =
+    hasNext ? `You defeated ${boss.name}! Next boss awaits...` : 'You conquered ALL bosses!';
+  document.getElementById('victoryBossName').textContent = `⚔️ Defeated: ${boss.emoji} ${boss.name}`;
+  document.getElementById('vScore').textContent   = G.score;
+  document.getElementById('vCorrect').textContent = G.correct;
+  document.getElementById('vWrong').textContent   = G.wrong;
+  document.getElementById('vStreakBadge').textContent = `🔥 Best Streak: ${G.bestStreak}`;
+  document.querySelector('#screen-victory .end-btn-play').textContent = hasNext ? '⚔️ NEXT BOSS' : '🏠 Play Again';
+  switchScreen('screen-victory');
+}
+
+function endDefeat() {
+  const boss = BOSSES[Math.min(G.level, BOSSES.length-1)];
+  playDefeat();
+  document.getElementById('goatBossName').textContent = `💀 Beaten by: ${boss.emoji} ${boss.name}`;
+  document.getElementById('goScore').textContent   = G.score;
+  document.getElementById('goCorrect').textContent = G.correct;
+  document.getElementById('goWrong').textContent   = G.wrong;
+  document.getElementById('goStreakBadge').textContent = `🔥 Best Streak: ${G.bestStreak}`;
+  switchScreen('screen-gameover');
+}
+
+function nextLevel() {
+  if (G.level >= BOSSES.length-1) { goHome(); return; }
+  G.level++;
+  G.correct=0; G.wrong=0; G.streak=0;
+  loadLevel();
+}
+
+function restartGame() {
+  G.level=0; G.score=0; G.correct=0; G.wrong=0; G.streak=0; G.bestStreak=0;
+  loadLevel();
+}
+
+function goHome() {
+  stopTimer();
+  // Reset mode cards on start screen
+  G.diff='easy'; G.level=0; G.score=0;
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('previewBoss').textContent='👾';
+  switchScreen('screen-start');
+}
+</script>
+</body>
+</html>

@@ -30,6 +30,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(26,46,69,.97
 .tabs{display:flex;max-width:900px;margin:0 auto;overflow-x:auto;}
 .tab-btn{flex:1;min-width:150px;padding:18px 12px;border:none;background:none;font-family:"DM Sans",sans-serif;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer;transition:color .2s;border-bottom:3px solid transparent;text-align:center;white-space:nowrap;}
 .tab-btn.active{color:var(--orange);border-bottom-color:var(--orange);}
+.tab-btn.tab-games{color:#8e44ad !important;}
+.tab-btn.tab-games.active{color:#8e44ad !important;border-bottom-color:#8e44ad !important;}
 .tab-btn:hover:not(.active){color:var(--navy);}
 /* MAIN CONTENT */
 .phase-panel{display:none;max-width:1100px;margin:0 auto;padding:40px 5vw 80px;}
@@ -116,6 +118,31 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(26,46,69,.97
 /* EMPTY STATE */
 .ws-empty{text-align:center;padding:60px 20px;color:var(--muted);}
 .ws-empty-icon{font-size:3rem;margin-bottom:12px;}
+
+/* GAMES SECTION */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-bottom:60px;}
+.game-card{background:rgba(255,255,255,.95);border-radius:22px;overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,.2);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;}
+.game-card:not(.game-card-soon):hover{transform:translateY(-6px);box-shadow:0 14px 48px rgba(0,0,0,.28);}
+.game-card-soon{opacity:.75;}
+.game-card-header{padding:22px 20px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.game-card-icon{font-size:2.8rem;}
+.game-card-badges{display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
+.game-badge{background:rgba(255,255,255,.18);color:#fff;font-size:.68rem;font-weight:800;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.game-badge.coming{background:rgba(255,255,255,.08);opacity:.7;}
+.game-card-body{padding:18px 20px;flex:1;}
+.game-card-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:8px;}
+.game-card-desc{font-size:.86rem;color:#5a6a7a;line-height:1.6;margin-bottom:14px;}
+.game-card-features{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.game-card-features span{background:#f0f4f8;border-radius:50px;padding:3px 11px;font-size:.72rem;font-weight:700;color:#4a5568;}
+.game-card-meta{display:flex;flex-wrap:wrap;gap:8px;}
+.game-card-meta span{font-size:.74rem;color:#7a8a99;font-weight:600;}
+.game-card-footer{padding:14px 20px;border-top:1px solid #edf0f4;}
+.game-play-btn{display:block;width:100%;text-align:center;background:var(--navy);color:#fff;text-decoration:none;padding:12px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;border:none;}
+.game-play-btn:hover{background:#253f5c;transform:translateY(-2px);}
+.game-soon-btn{background:#aaa;cursor:not-allowed !important;}
+.game-soon-btn:hover{transform:none !important;background:#aaa !important;}
+@media(max-width:640px){.games-grid{grid-template-columns:1fr;}}
+
 @media(max-width:640px){.ws-modal-header{padding:20px;}.ws-modal-body{padding:20px 16px 32px;}.ws-grid{grid-template-columns:1fr;}}
 /* LOGIN GATE */
 .login-gate{position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#1a2e45,#0e1d30);display:flex;align-items:center;justify-content:center;padding:20px;}
@@ -138,7 +165,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(26,46,69,.97
 .login-footer strong{color:var(--navy);}
 .page-content{display:none;}
 .page-content.unlocked{display:block;}
-.logged-in-bar{background:linear-gradient(135deg,var(--navy),#1d3a58);padding:10px 5vw;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.logged-in-bar{background:linear-gradient(135deg,var(--navy),#1d3a58);padding:10px 5vw;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:64px;}
 .logged-in-bar.show{display:flex;}
 .logged-in-info{color:rgba(255,255,255,.85);font-size:.82rem;}
 .logged-in-info strong{color:#fff;}
@@ -189,20 +216,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(26,46,69,.97
   <button class="logout-btn" onclick="doLogout()">&#128682; Log Out</button>
 </div>
 
-<!-- MATH GAME BANNER -->
-<div style="max-width:1100px;margin:0 auto;padding:20px 5vw 0;">
-  <div style="background:linear-gradient(135deg,#8e44ad,#6c3483);border-radius:20px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:16px;">
-      <span style="font-size:2.8rem;">🧮</span>
-      <div>
-        <div style="color:rgba(255,255,255,.7);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px;">Interactive Learning</div>
-        <div style="color:#fff;font-family:Playfair Display,serif;font-size:1.3rem;font-weight:700;margin-bottom:4px;">Math Builder Game</div>
-        <div style="color:rgba(255,255,255,.65);font-size:.85rem;">Practise Addition, Subtraction, Multiplication & Division with fun visual activities</div>
-      </div>
-    </div>
-    <a href="mathgame.html" style="background:#fff;color:#8e44ad;text-decoration:none;padding:12px 28px;border-radius:50px;font-family:DM Sans,sans-serif;font-size:.95rem;font-weight:800;white-space:nowrap;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.2);">🎮 Play Now</a>
-  </div>
-</div>
 
 <div class="hero">
   <img src="logo.png" alt="Mentor Me Tutor" class="hero-logo" onerror="this.style.display='none'"/>
@@ -2834,6 +2847,131 @@ function downloadWorksheet(wid) {
   if (win) win.onload = function() { win.focus(); win.print(); };
 }
 </script>
+<div class="phase-panel" id="phase-games">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;padding:0 0 32px;">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#8e44ad;margin-bottom:8px;">Interactive Learning</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2.2rem);color:#fff;margin-bottom:10px;">Learning Games</h2>
+      <p style="color:rgba(255,255,255,.6);font-size:.92rem;max-width:520px;margin:0 auto;">Fun, interactive games that help you practise maths skills through visual play. New games added regularly!</p>
+    </div>
+    <div class="games-grid" id="gamesGrid">
+
+      <!-- MATH BUILDER CARD -->
+      <div class="game-card">
+        <div class="game-card-header" style="background:linear-gradient(135deg,#8e44ad,#6c3483);">
+          <span class="game-card-icon">🧮</span>
+          <div class="game-card-badges">
+            <span class="game-badge">Grades 4–7</span>
+            <span class="game-badge">🟢 Ready to Play</span>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">Math Builder</h3>
+          <p class="game-card-desc">Practise Addition, Subtraction, Multiplication and Division using fun visual models — arrays, groups and objects.</p>
+          <div class="game-card-features">
+            <span>➕ Addition</span>
+            <span>➖ Subtraction</span>
+            <span>✖️ Multiplication</span>
+            <span>➗ Division</span>
+          </div>
+          <div class="game-card-meta">
+            <span>⭐ 3 Difficulty Levels</span>
+            <span>🏅 10 Badges</span>
+            <span>⏱ Timer Mode</span>
+          </div>
+        </div>
+        <div class="game-card-footer">
+          <a href="mathgame.html" class="game-play-btn">🎮 Play Now</a>
+        </div>
+      </div>
+
+
+      <!-- BOSS BATTLE CARD -->
+      <div class="game-card">
+        <div class="game-card-header" style="background:linear-gradient(135deg,#e74c3c,#922b21);">
+          <span class="game-card-icon">⚔️</span>
+          <div class="game-card-badges">
+            <span class="game-badge">Grades 4–12</span>
+            <span class="game-badge">🟢 Ready to Play</span>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">Boss Battle Maths</h3>
+          <p class="game-card-desc">Battle a boss character by solving maths problems. Answer correctly to deal damage — answer wrong and the boss attacks you!</p>
+          <div class="game-card-features">
+            <span>⚔️ Combat System</span>
+            <span>🔥 Combo Streaks</span>
+            <span>👾 6 Bosses</span>
+            <span>⏱ Speed Timer</span>
+          </div>
+          <div class="game-card-meta">
+            <span>⭐ 3 Difficulty Levels</span>
+            <span>🏆 Level Progression</span>
+          </div>
+        </div>
+        <div class="game-card-footer">
+          <a href="bossbattle.html" class="game-play-btn" style="background:linear-gradient(135deg,#e74c3c,#c0392b);">⚔️ Battle Now</a>
+        </div>
+      </div>
+
+      <!-- COMING SOON CARD 2 -->
+      <div class="game-card game-card-soon">
+        <div class="game-card-header" style="background:linear-gradient(135deg,#2d6a8f,#1a2e45);">
+          <span class="game-card-icon">🔢</span>
+          <div class="game-card-badges">
+            <span class="game-badge">Grades 4–9</span>
+            <span class="game-badge coming">🔜 Coming Soon</span>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">Number Explorer</h3>
+          <p class="game-card-desc">Explore number patterns, fractions and place value through interactive challenges and puzzles.</p>
+          <div class="game-card-features">
+            <span>🔢 Place Value</span>
+            <span>½ Fractions</span>
+            <span>📐 Patterns</span>
+          </div>
+          <div class="game-card-meta">
+            <span>⭐ Multiple Levels</span>
+            <span>🏅 Badges</span>
+          </div>
+        </div>
+        <div class="game-card-footer">
+          <button class="game-play-btn game-soon-btn" disabled>🔜 Coming Soon</button>
+        </div>
+      </div>
+
+      <!-- COMING SOON CARD 3 -->
+      <div class="game-card game-card-soon">
+        <div class="game-card-header" style="background:linear-gradient(135deg,#27ae60,#1e8449);">
+          <span class="game-card-icon">📝</span>
+          <div class="game-card-badges">
+            <span class="game-badge">Grades 4–12</span>
+            <span class="game-badge coming">🔜 Coming Soon</span>
+          </div>
+        </div>
+        <div class="game-card-body">
+          <h3 class="game-card-title">Word Wizard</h3>
+          <p class="game-card-desc">Build vocabulary, practise grammar and improve spelling through interactive English language games.</p>
+          <div class="game-card-features">
+            <span>📚 Vocabulary</span>
+            <span>✍️ Grammar</span>
+            <span>🔤 Spelling</span>
+          </div>
+          <div class="game-card-meta">
+            <span>⭐ Multiple Levels</span>
+            <span>🏅 Badges</span>
+          </div>
+        </div>
+        <div class="game-card-footer">
+          <button class="game-play-btn game-soon-btn" disabled>🔜 Coming Soon</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </div><!-- end page content -->
 </body>
 </html>
