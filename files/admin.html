@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard | Mentor Me Tutor</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#1a2e45;--teal:#2d6a8f;--orange:#f07c1e;--cream:#fdf8f2;--white:#fff;--text:#2c2c2c;--muted:#7a8a99;--green:#27ae60;--red:#e74c3c;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text);}
+/* ── LOGIN ── */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),#0e1d30);padding:20px;}
+.login-card{background:#fff;border-radius:24px;padding:44px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.4);}
+.login-logo{height:70px;border-radius:14px;margin-bottom:16px;}
+.login-title{font-family:"Playfair Display",serif;font-size:1.4rem;color:var(--navy);margin-bottom:4px;}
+.login-sub{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.login-field{margin-bottom:14px;text-align:left;}
+.login-field label{display:block;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);margin-bottom:5px;}
+.login-field input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.92rem;outline:none;transition:border-color .2s;}
+.login-field input:focus{border-color:var(--teal);}
+.login-error{background:#f8d7da;border:1px solid #f5c6cb;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#721c24;margin-bottom:12px;display:none;}
+.login-error.show{display:block;}
+.login-btn{width:100%;background:var(--navy);color:#fff;border:none;padding:13px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;}
+.login-btn:hover{background:#253f5c;}
+/* ── DASHBOARD ── */
+#dashboard{display:none;}
+.dash-nav{background:var(--navy);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.25);}
+.dash-nav-logo{display:flex;align-items:center;gap:10px;}
+.dash-nav-logo img{height:34px;border-radius:8px;}
+.dash-nav-logo span{color:#fff;font-family:"Playfair Display",serif;font-size:1rem;}
+.dash-nav-right{display:flex;align-items:center;gap:12px;}
+.admin-badge{background:rgba(255,255,255,.12);border-radius:50px;padding:4px 14px;color:rgba(255,255,255,.8);font-size:.78rem;font-weight:600;}
+.logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 16px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.78rem;cursor:pointer;transition:background .2s;}
+.logout-btn:hover{background:rgba(255,255,255,.2);}
+/* ── TAB BAR ── */
+.tab-bar{background:#fff;border-bottom:2px solid #edf0f4;padding:0 24px;display:flex;gap:4px;overflow-x:auto;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.tab-btn{padding:16px 18px;border:none;background:none;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s;white-space:nowrap;}
+.tab-btn.active{color:var(--orange);border-bottom-color:var(--orange);}
+.tab-btn:hover:not(.active){color:var(--navy);}
+/* ── CONTENT ── */
+.dash-content{max-width:1200px;margin:0 auto;padding:28px 24px 60px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
+.stat-card{background:#fff;border-radius:16px;padding:22px 20px;box-shadow:0 2px 12px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+.stat-card.green{border-color:var(--green);}
+.stat-card.blue{border-color:var(--teal);}
+.stat-card.purple{border-color:#8e44ad;}
+.stat-num{font-family:"Playfair Display",serif;font-size:2.2rem;font-weight:700;color:var(--navy);}
+.stat-lbl{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+/* ── SECTION HEADERS ── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.section-title{font-family:"Playfair Display",serif;font-size:1.2rem;color:var(--navy);}
+.search-input{padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;min-width:220px;}
+.search-input:focus{border-color:var(--teal);}
+/* ── TABLE ── */
+.table-wrap{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+table{width:100%;border-collapse:collapse;}
+th{background:#f4f7fb;padding:12px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+td{padding:12px 14px;font-size:.88rem;border-bottom:1px solid #f0f4f8;vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafbfd;}
+.badge{display:inline-block;padding:2px 10px;border-radius:50px;font-size:.7rem;font-weight:700;}
+.badge-green{background:#d4edda;color:#155724;}
+.badge-red{background:#f8d7da;color:#721c24;}
+.badge-blue{background:#cce5ff;color:#004085;}
+.badge-orange{background:#fff3cd;color:#856404;}
+.badge-unread{background:#e74c3c;color:#fff;}
+.badge-read{background:#e8ecf0;color:#7a8a99;}
+/* ── ACTION BUTTONS ── */
+.btn{padding:7px 16px;border-radius:50px;border:none;font-family:"DM Sans",sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-primary{background:var(--navy);color:#fff;}
+.btn-primary:hover{background:#253f5c;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#c0392b;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#1e9449;}
+.btn-outline{background:none;border:1.5px solid var(--navy);color:var(--navy);}
+.btn-outline:hover{background:var(--navy);color:#fff;}
+.btns-row{display:flex;gap:6px;}
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.modal h3{font-family:"Playfair Display",serif;font-size:1.2rem;color:var(--navy);margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin-bottom:5px;}
+.form-group input,.form-group select{width:100%;padding:10px 13px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--teal);}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+/* ── LOADING ── */
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:.9rem;}
+.spinner{width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+.empty-icon{font-size:2.5rem;margin-bottom:10px;}
+/* ── DETAIL EXPAND ── */
+.detail-row{background:#f8f9ff !important;}
+.detail-box{background:#f0f4f8;border-radius:10px;padding:12px 16px;font-size:.82rem;line-height:1.8;color:#4a5568;}
+/* ── RESPONSIVE ── */
+@media(max-width:640px){.form-row{grid-template-columns:1fr;}.stat-grid{grid-template-columns:1fr 1fr;}.dash-content{padding:16px 14px 40px;}}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <img src="logo.png" alt="MMT" class="login-logo" onerror="this.style.display='none'"/>
+    <div class="login-title">Admin Dashboard</div>
+    <p class="login-sub">Mentor Me Tutor · Staff Access Only</p>
+    <div class="login-error" id="loginErr">Incorrect email or password.</div>
+    <div class="login-field">
+      <label>Admin Email</label>
+      <input type="email" id="adminEmail" placeholder="mentormetutor2025@gmail.com" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="adminPw" placeholder="Your admin password" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <button class="login-btn" onclick="doAdminLogin()">🔐 Login to Dashboard</button>
+  </div>
+</div>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div id="dashboard">
+  <nav class="dash-nav">
+    <div class="dash-nav-logo">
+      <img src="logo.png" alt="MMT" style="height:34px;border-radius:8px;" onerror="this.style.display='none'"/>
+      <span>MMT Admin</span>
+    </div>
+    <div class="dash-nav-right">
+      <span class="admin-badge" id="adminEmailBadge">admin</span>
+      <button class="logout-btn" onclick="doLogout()">Log Out</button>
+    </div>
+  </nav>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">📊 Overview</button>
+    <button class="tab-btn" onclick="switchTab('enquiries',this)">📬 Enquiries</button>
+    <button class="tab-btn" onclick="switchTab('results',this)">📝 Results</button>
+    <button class="tab-btn" onclick="switchTab('leaderboard',this)">🎮 Leaderboard</button>
+    <button class="tab-btn" onclick="switchTab('students',this)">👥 Students</button>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="tab-panel active" id="panel-overview">
+      <div class="stat-grid" id="statsGrid">
+        <div class="stat-card"><div class="spinner"></div></div>
+      </div>
+      <div class="section-hdr"><div class="section-title">Recent Enquiries</div></div>
+      <div class="table-wrap" id="recentEnquiries"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+
+    <!-- ══ ENQUIRIES ══ -->
+    <div class="tab-panel" id="panel-enquiries">
+      <div class="section-hdr">
+        <div class="section-title">All Enquiries</div>
+        <input class="search-input" id="enquirySearch" placeholder="🔍 Search enquiries..." oninput="filterEnquiries()"/>
+      </div>
+      <div class="table-wrap" id="enquiriesTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+
+    <!-- ══ RESULTS ══ -->
+    <div class="tab-panel" id="panel-results">
+      <div class="section-hdr">
+        <div class="section-title">Assessment Results</div>
+        <input class="search-input" id="resultsSearch" placeholder="🔍 Search by name..." oninput="filterResults()"/>
+      </div>
+      <div class="table-wrap" id="resultsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+
+    <!-- ══ LEADERBOARD ══ -->
+    <div class="tab-panel" id="panel-leaderboard">
+      <div class="section-hdr">
+        <div class="section-title">Game Leaderboard</div>
+        <select id="gameFilter" onchange="renderLeaderboard()" style="padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;">
+          <option value="all">All Games</option>
+          <option value="Math Builder">Math Builder</option>
+          <option value="Boss Battle Maths">Boss Battle Maths</option>
+        </select>
+      </div>
+      <div class="table-wrap" id="leaderboardTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+
+    <!-- ══ STUDENTS ══ -->
+    <div class="tab-panel" id="panel-students">
+      <div class="section-hdr">
+        <div class="section-title">Student Accounts</div>
+        <div style="display:flex;gap:10px;">
+          <input class="search-input" id="studentSearch" placeholder="🔍 Search students..." oninput="filterStudents()" style="min-width:180px;"/>
+          <button class="btn btn-success" onclick="openAddStudent()">+ Add Student</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="studentsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+
+  </div><!-- /dash-content -->
+</div><!-- /dashboard -->
+
+<!-- ════════════════ ADD/EDIT STUDENT MODAL ════════════════ -->
+<div class="modal-overlay" id="studentModal">
+  <div class="modal">
+    <h3 id="modalTitle">Add New Student</h3>
+    <input type="hidden" id="editStudentId"/>
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name *</label>
+        <input type="text" id="sFirstName" placeholder="e.g. Afika"/>
+      </div>
+      <div class="form-group">
+        <label>Surname *</label>
+        <input type="text" id="sSurname" placeholder="e.g. Madela"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Student Number *</label>
+        <input type="text" id="sStudentNum" placeholder="e.g. MMT-2026-007"/>
+      </div>
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="text" id="sPassword" placeholder="e.g. focus2026"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Grade</label>
+        <select id="sGrade">
+          <option value="">Select grade</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+          <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+          <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>School</label>
+        <input type="text" id="sSchool" placeholder="School name"/>
+      </div>
+    </div>
+    <div id="modalError" style="color:var(--red);font-size:.82rem;margin-bottom:8px;display:none;"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeStudentModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStudent()">💾 Save Student</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let ALL_ENQUIRIES = [], ALL_RESULTS = [], ALL_SCORES = [], ALL_STUDENTS = [];
+
+// ════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════
+async function doAdminLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pw    = document.getElementById('adminPw').value.trim();
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.remove('show');
+  if (!email || !pw) { errEl.textContent='Please enter email and password.'; errEl.classList.add('show'); return; }
+  try {
+    await auth.signInWithEmailAndPassword(email, pw);
+  } catch(e) {
+    errEl.textContent = 'Incorrect email or password.';
+    errEl.classList.add('show');
+  }
+}
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display  = 'block';
+    document.getElementById('adminEmailBadge').textContent = user.email;
+    loadAllData();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display   = 'none';
+  }
+});
+
+function doLogout() { auth.signOut(); }
+
+// ════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════
+// LOAD ALL DATA
+// ════════════════════════════════════════════════════════
+async function loadAllData() {
+  await Promise.all([loadEnquiries(), loadResults(), loadScores(), loadStudents()]);
+  renderOverview();
+}
+
+async function loadEnquiries() {
+  try {
+    const snap = await db.collection('enquiries').orderBy('timestamp','desc').limit(200).get();
+    ALL_ENQUIRIES = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderEnquiriesTable(ALL_ENQUIRIES);
+    renderRecentEnquiries();
+  } catch(e) { document.getElementById('enquiriesTable').innerHTML = errBox('Could not load enquiries: '+e.message); }
+}
+
+async function loadResults() {
+  try {
+    const snap = await db.collection('assessmentResults').orderBy('timestamp','desc').limit(500).get();
+    ALL_RESULTS = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderResultsTable(ALL_RESULTS);
+  } catch(e) { document.getElementById('resultsTable').innerHTML = errBox('Could not load results: '+e.message); }
+}
+
+async function loadScores() {
+  try {
+    const snap = await db.collection('gameScores').orderBy('score','desc').limit(200).get();
+    ALL_SCORES = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderLeaderboard();
+  } catch(e) { document.getElementById('leaderboardTable').innerHTML = errBox('Could not load scores: '+e.message); }
+}
+
+async function loadStudents() {
+  try {
+    const snap = await db.collection('students').orderBy('studentNumber').get();
+    ALL_STUDENTS = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderStudentsTable(ALL_STUDENTS);
+  } catch(e) { document.getElementById('studentsTable').innerHTML = errBox('Could not load students: '+e.message); }
+}
+
+// ════════════════════════════════════════════════════════
+// OVERVIEW
+// ════════════════════════════════════════════════════════
+function renderOverview() {
+  const unread = ALL_ENQUIRIES.filter(e=>!e.read).length;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${ALL_ENQUIRIES.length}</div><div class="stat-lbl">📬 Total Enquiries</div></div>
+    <div class="stat-card orange"><div class="stat-num" style="color:var(--red)">${unread}</div><div class="stat-lbl">🔴 Unread Enquiries</div></div>
+    <div class="stat-card green"><div class="stat-num">${ALL_STUDENTS.length}</div><div class="stat-lbl">👥 Students</div></div>
+    <div class="stat-card blue"><div class="stat-num">${ALL_RESULTS.length}</div><div class="stat-lbl">📝 Assessments Done</div></div>
+    <div class="stat-card purple"><div class="stat-num">${ALL_SCORES.length}</div><div class="stat-lbl">🎮 Game Plays</div></div>
+  `;
+}
+
+function renderRecentEnquiries() {
+  const recent = ALL_ENQUIRIES.slice(0,5);
+  if (!recent.length) { document.getElementById('recentEnquiries').innerHTML='<div class="empty-state"><div class="empty-icon">📬</div>No enquiries yet.</div>'; return; }
+  let rows = recent.map(e=>`
+    <tr>
+      <td><strong>${esc(e.name||'')}</strong><br/><span style="font-size:.78rem;color:var(--muted)">${esc(e.email||'')}</span></td>
+      <td>${esc(e.phone||'—')}</td>
+      <td>${esc(e.grade||'—')}</td>
+      <td>${fmtDate(e.timestamp)}</td>
+      <td><span class="badge ${e.read?'badge-read':'badge-unread'}">${e.read?'Read':'New'}</span></td>
+    </tr>`).join('');
+  document.getElementById('recentEnquiries').innerHTML=`<table><thead><tr><th>Parent / Guardian</th><th>Phone</th><th>Grade</th><th>Date</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ════════════════════════════════════════════════════════
+// ENQUIRIES
+// ════════════════════════════════════════════════════════
+function renderEnquiriesTable(data) {
+  if (!data.length) { document.getElementById('enquiriesTable').innerHTML='<div class="empty-state"><div class="empty-icon">📬</div>No enquiries found.</div>'; return; }
+  let rows = data.map(e=>`
+    <tr>
+      <td><strong>${esc(e.name||'')}</strong></td>
+      <td>${esc(e.email||'—')}</td>
+      <td>${esc(e.phone||'—')}</td>
+      <td>${esc(e.grade||'—')}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.message||'')}">${esc((e.message||'').substring(0,60))}${(e.message||'').length>60?'…':''}</td>
+      <td>${fmtDate(e.timestamp)}</td>
+      <td><span class="badge ${e.read?'badge-read':'badge-unread'}">${e.read?'Read':'New'}</span></td>
+      <td>
+        <div class="btns-row">
+          ${!e.read?`<button class="btn btn-outline" onclick="markRead('${e.id}')">✓ Read</button>`:''}
+          <button class="btn btn-danger" onclick="deleteEnquiry('${e.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('enquiriesTable').innerHTML=`<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Grade</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function filterEnquiries() {
+  const q = document.getElementById('enquirySearch').value.toLowerCase();
+  renderEnquiriesTable(ALL_ENQUIRIES.filter(e=>
+    (e.name||'').toLowerCase().includes(q)||
+    (e.email||'').toLowerCase().includes(q)||
+    (e.phone||'').toLowerCase().includes(q)||
+    (e.grade||'').toLowerCase().includes(q)||
+    (e.message||'').toLowerCase().includes(q)
+  ));
+}
+
+async function markRead(id) {
+  await db.collection('enquiries').doc(id).update({read:true});
+  const e = ALL_ENQUIRIES.find(x=>x.id===id); if(e) e.read=true;
+  filterEnquiries(); renderOverview();
+}
+
+async function deleteEnquiry(id) {
+  if (!confirm('Delete this enquiry?')) return;
+  await db.collection('enquiries').doc(id).delete();
+  ALL_ENQUIRIES = ALL_ENQUIRIES.filter(e=>e.id!==id);
+  filterEnquiries(); renderOverview(); renderRecentEnquiries();
+}
+
+// ════════════════════════════════════════════════════════
+// ASSESSMENT RESULTS
+// ════════════════════════════════════════════════════════
+function renderResultsTable(data) {
+  if (!data.length) { document.getElementById('resultsTable').innerHTML='<div class="empty-state"><div class="empty-icon">📝</div>No assessment results yet.</div>'; return; }
+  let rows = data.map(r=>{
+    const pct = r.percentage || (r.mcTotal>0?Math.round(r.mcScore/r.mcTotal*100):0);
+    const color = pct>=75?'badge-green':pct>=50?'badge-orange':'badge-red';
+    return `<tr>
+      <td><strong>${esc(r.studentName||r.studentNumber||'')}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${esc(r.studentNumber||'')}</span></td>
+      <td>${esc(r.subject||'')}</td>
+      <td>${esc(r.phase||'')}</td>
+      <td>${esc(r.grade||'')}</td>
+      <td><span class="badge ${color}">${r.mcScore||0}/${r.mcTotal||0} (${pct}%)</span></td>
+      <td>${r.shortTotal>0?`<span style="font-size:.78rem;color:var(--muted)">+${r.shortTotal} written marks (tutor)</span>`:'—'}</td>
+      <td>${fmtDate(r.timestamp)}</td>
+      <td><button class="btn btn-danger" onclick="deleteResult('${r.id}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('resultsTable').innerHTML=`<table><thead><tr><th>Learner</th><th>Subject</th><th>Phase</th><th>Grade</th><th>Auto Score</th><th>Written</th><th>Date</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function filterResults() {
+  const q = document.getElementById('resultsSearch').value.toLowerCase();
+  renderResultsTable(ALL_RESULTS.filter(r=>
+    (r.studentName||'').toLowerCase().includes(q)||
+    (r.studentNumber||'').toLowerCase().includes(q)||
+    (r.subject||'').toLowerCase().includes(q)
+  ));
+}
+
+async function deleteResult(id) {
+  if (!confirm('Delete this result?')) return;
+  await db.collection('assessmentResults').doc(id).delete();
+  ALL_RESULTS = ALL_RESULTS.filter(r=>r.id!==id);
+  filterResults(); renderOverview();
+}
+
+// ════════════════════════════════════════════════════════
+// LEADERBOARD
+// ════════════════════════════════════════════════════════
+function renderLeaderboard() {
+  const filter = document.getElementById('gameFilter').value;
+  const data = filter==='all' ? ALL_SCORES : ALL_SCORES.filter(s=>s.game===filter);
+  if (!data.length) { document.getElementById('leaderboardTable').innerHTML='<div class="empty-state"><div class="empty-icon">🎮</div>No game scores yet.</div>'; return; }
+  let rows = data.map((s,i)=>{
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const diffColor = s.difficulty==='hard'?'badge-red':s.difficulty==='medium'?'badge-orange':'badge-green';
+    return `<tr>
+      <td style="font-size:1.1rem;text-align:center">${medal}</td>
+      <td><strong>${esc(s.studentName||s.studentNumber||'')}</strong><br/><span style="font-size:.75rem;color:var(--muted)">${esc(s.studentNumber||'')}</span></td>
+      <td>${esc(s.game||'')}</td>
+      <td style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--navy)">${s.score||0}</td>
+      <td><span class="badge ${diffColor}">${(s.difficulty||'').charAt(0).toUpperCase()+(s.difficulty||'').slice(1)}</span></td>
+      <td>${s.correct||0}✅ ${s.wrong||0}❌</td>
+      <td>${s.accuracy||'—'}</td>
+      <td>${s.level||'—'}</td>
+      <td>${fmtDate(s.timestamp)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('leaderboardTable').innerHTML=`<table><thead><tr><th>Rank</th><th>Learner</th><th>Game</th><th>Score</th><th>Difficulty</th><th>Answers</th><th>Accuracy</th><th>Level</th><th>Date</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STUDENTS
+// ════════════════════════════════════════════════════════
+function renderStudentsTable(data) {
+  if (!data.length) { document.getElementById('studentsTable').innerHTML='<div class="empty-state"><div class="empty-icon">👥</div>No students yet. Click "+ Add Student" to get started.</div>'; return; }
+  let rows = data.map(s=>`
+    <tr>
+      <td><strong>${esc(s.studentNumber||'')}</strong></td>
+      <td>${esc(s.name||((s.firstName||'')+(s.surname?' '+s.surname:''))||'')}</td>
+      <td>${esc(s.grade||'—')}</td>
+      <td>${esc(s.school||'—')}</td>
+      <td><code style="background:#f0f4f8;padding:2px 8px;border-radius:6px;font-size:.82rem;">${esc(s.password||'')}</code></td>
+      <td><span class="badge ${s.active!==false?'badge-green':'badge-red'}">${s.active!==false?'Active':'Inactive'}</span></td>
+      <td>
+        <div class="btns-row">
+          <button class="btn btn-outline" onclick="openEditStudent('${s.id}')">✏️ Edit</button>
+          <button class="btn btn-danger" onclick="deleteStudent('${s.id}','${esc(s.studentNumber||'')}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('studentsTable').innerHTML=`<table><thead><tr><th>Student No.</th><th>Name</th><th>Grade</th><th>School</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function filterStudents() {
+  const q = document.getElementById('studentSearch').value.toLowerCase();
+  renderStudentsTable(ALL_STUDENTS.filter(s=>
+    (s.studentNumber||'').toLowerCase().includes(q)||
+    (s.name||'').toLowerCase().includes(q)||
+    (s.grade||'').toLowerCase().includes(q)||
+    (s.school||'').toLowerCase().includes(q)
+  ));
+}
+
+function openAddStudent() {
+  document.getElementById('modalTitle').textContent = 'Add New Student';
+  document.getElementById('editStudentId').value = '';
+  ['sFirstName','sSurname','sStudentNum','sPassword','sSchool'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sGrade').value='';
+  document.getElementById('modalError').style.display='none';
+  document.getElementById('studentModal').classList.add('show');
+}
+
+function openEditStudent(id) {
+  const s = ALL_STUDENTS.find(x=>x.id===id);
+  if (!s) return;
+  document.getElementById('modalTitle').textContent = 'Edit Student';
+  document.getElementById('editStudentId').value = id;
+  const nameParts = (s.name||'').split(' ');
+  document.getElementById('sFirstName').value = s.firstName || nameParts[0]||'';
+  document.getElementById('sSurname').value   = s.surname   || nameParts.slice(1).join(' ')||'';
+  document.getElementById('sStudentNum').value= s.studentNumber||'';
+  document.getElementById('sPassword').value  = s.password||'';
+  document.getElementById('sGrade').value     = s.grade||'';
+  document.getElementById('sSchool').value    = s.school||'';
+  document.getElementById('modalError').style.display='none';
+  document.getElementById('studentModal').classList.add('show');
+}
+
+function closeStudentModal() { document.getElementById('studentModal').classList.remove('show'); }
+
+async function saveStudent() {
+  const id         = document.getElementById('editStudentId').value;
+  const firstName  = document.getElementById('sFirstName').value.trim();
+  const surname    = document.getElementById('sSurname').value.trim();
+  const studentNum = document.getElementById('sStudentNum').value.trim().toUpperCase();
+  const password   = document.getElementById('sPassword').value.trim();
+  const grade      = document.getElementById('sGrade').value;
+  const school     = document.getElementById('sSchool').value.trim();
+  const errEl      = document.getElementById('modalError');
+
+  if (!firstName||!surname||!studentNum||!password) {
+    errEl.textContent='Please fill in all required fields.'; errEl.style.display='block'; return;
+  }
+  errEl.style.display='none';
+
+  const data = {
+    firstName, surname, name:firstName+' '+surname,
+    studentNumber:studentNum, password, grade, school,
+    active:true, updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    if (id) {
+      await db.collection('students').doc(id).update(data);
+      const idx = ALL_STUDENTS.findIndex(s=>s.id===id);
+      if (idx>-1) ALL_STUDENTS[idx]={id,...data};
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await db.collection('students').add(data);
+      ALL_STUDENTS.push({id:ref.id,...data});
+    }
+    closeStudentModal();
+    filterStudents();
+    renderOverview();
+  } catch(e) { errEl.textContent='Error saving: '+e.message; errEl.style.display='block'; }
+}
+
+async function deleteStudent(id, num) {
+  if (!confirm(`Delete student ${num}? This cannot be undone.`)) return;
+  await db.collection('students').doc(id).delete();
+  ALL_STUDENTS = ALL_STUDENTS.filter(s=>s.id!==id);
+  filterStudents(); renderOverview();
+}
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+}
+function errBox(msg) { return `<div class="empty-state"><div class="empty-icon">⚠️</div><p style="color:var(--red)">${msg}</p></div>`; }
+
+// Close modal on backdrop click
+document.getElementById('studentModal').addEventListener('click',e=>{if(e.target===document.getElementById('studentModal'))closeStudentModal();});
+</script>
+</body>
+</html>
