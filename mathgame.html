@@ -1114,9 +1114,43 @@ function getStudentInfo() {
   return { name: 'Student', num: 'Unknown', grade: '' };
 }
 
+function getStudentInfo() {
+  try {
+    var sess = sessionStorage.getItem('mmtStudent');
+    if (sess) {
+      var s = JSON.parse(sess);
+      return { name: s.name || 'Student', num: s.num || 'Unknown', grade: s.grade || '' };
+    }
+  } catch(e) {}
+  return { name: 'Student', num: 'Unknown', grade: '' };
+}
+
 function endGame() {
   clearTimer();
   playSound('complete');
+
+  // ── Save score to Firestore ─────────────────────────
+  if (typeof db !== 'undefined' && db) {
+    try {
+      var student = getStudentInfo();
+      db.collection('gameScores').add({
+        studentName:    student.name,
+        studentNumber:  student.num,
+        grade:          student.grade,
+        game:           'Math Builder',
+        mode:           G.mode,
+        score:          G.score,
+        correct:        G.correctCount,
+        wrong:          G.wrongCount,
+        difficulty:     G.difficulty,
+        totalQuestions: G.totalQuestions,
+        accuracy:       Math.round((G.correctCount / Math.max(G.totalQuestions,1)) * 100) + '%',
+        bestStreak:     G.bestStreak,
+        level:          G.level,
+        timestamp:      new Date()
+      });
+    } catch(e) { console.warn('Score save failed:', e); }
+  }
 
   const pct = Math.round((G.correctCount / G.totalQuestions) * 100);
   const title = pct >= 90 ? '🏆 Outstanding!' : pct >= 70 ? '🌟 Well Done!' : pct >= 50 ? '👍 Good Effort!' : '💪 Keep Practising!';
