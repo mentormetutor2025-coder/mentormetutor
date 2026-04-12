@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mentor Me Tutor | Turning Efforts into Achievements</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #1a2e45;
+    --teal: #2d6a8f;
+    --orange: #f07c1e;
+    --cream: #fdf8f2;
+    --white: #ffffff;
+    --text: #2c2c2c;
+    --muted: #7a8a99;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(26, 46, 69, 0.97);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 68px;
+    box-shadow: 0 2px 20px rgba(0,0,0,.25);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none;
+  }
+  .nav-logo img { height: 44px; border-radius: 8px; }
+  .nav-logo span { color: var(--white); font-family: 'Playfair Display', serif; font-size: 1.15rem; letter-spacing: .02em; }
+  .nav-links { display: flex; gap: 16px; list-style: none; align-items: center; }
+  .nav-links a { color: rgba(255,255,255,.82); text-decoration: none; font-size: .78rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; transition: color .2s; white-space: nowrap; }
+  .nav-links a:hover { color: var(--orange); }
+  .nav-ws { color: #27ae60 !important; border: 1.5px solid rgba(39,174,96,.45); border-radius: 50px; padding: 4px 11px !important; transition: background .2s, color .2s !important; font-size: .74rem !important; }
+  .nav-ws:hover { background: #27ae60 !important; color: #fff !important; }
+  .nav-assess { color: var(--orange) !important; border: 1.5px solid rgba(240,124,30,.45); border-radius: 50px; padding: 4px 11px !important; transition: background .2s, color .2s !important; font-size: .74rem !important; }
+  .nav-assess:hover { background: var(--orange) !important; color: #fff !important; }
+  .nav-donate { color: #e74c3c !important; border: 1.5px solid rgba(231,76,60,.45); border-radius: 50px; padding: 4px 11px !important; transition: background .2s, color .2s !important; font-size: .74rem !important; }
+  .nav-donate:hover { background: #e74c3c !important; color: #fff !important; }
+  /* Hide plain text links on medium screens, keep pill buttons + CTA */
+  @media(max-width:1100px) { .nav-hide-md { display: none !important; } }
+  .nav-cta {
+    background: var(--orange); color: #fff; padding: 8px 18px; border-radius: 50px;
+    font-weight: 600; font-size: .78rem; text-decoration: none; letter-spacing: .04em;
+    transition: background .2s, transform .15s; white-space: nowrap;
+  }
+  .nav-cta:hover { background: #d96b0e; transform: translateY(-1px); }
+
+  /* hamburger */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: .3s; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--navy) 0%, #14233a 55%, #0e1d30 100%);
+    display: flex; align-items: center;
+    padding: 100px 5vw 60px;
+    position: relative; overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(45,106,143,.28) 0%, transparent 65%);
+  }
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    max-width: 1200px; margin: 0 auto; width: 100%;
+    position: relative;
+  }
+  .hero-tagline {
+    font-size: .8rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-tagline::before { content: ''; display: block; width: 30px; height: 2px; background: var(--orange); }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    color: var(--white); line-height: 1.12;
+    margin-bottom: 22px;
+  }
+  h1 em { color: var(--orange); font-style: normal; }
+  .hero-desc {
+    color: rgba(255,255,255,.72); font-size: 1.05rem; line-height: 1.7;
+    max-width: 480px; margin-bottom: 36px;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--orange); color: #fff; padding: 14px 32px;
+    border-radius: 50px; font-weight: 600; font-size: .95rem;
+    text-decoration: none; transition: background .2s, transform .15s;
+  }
+  .btn-primary:hover { background: #d96b0e; transform: translateY(-2px); }
+  .btn-outline {
+    border: 2px solid rgba(255,255,255,.35); color: #fff; padding: 13px 30px;
+    border-radius: 50px; font-weight: 500; font-size: .95rem;
+    text-decoration: none; transition: border-color .2s, background .2s;
+  }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+
+  .hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .hero-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 40px 36px;
+    max-width: 380px; width: 100%;
+    animation: float 5s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  .hero-logo-big { width: 160px; margin: 0 auto 24px; display: block; border-radius: 16px; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+  .stat {
+    background: rgba(255,255,255,.07); border-radius: 14px; padding: 18px 14px; text-align: center;
+  }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--orange); font-weight: 700; }
+  .stat-label { font-size: .74rem; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .08em; margin-top: 3px; }
+
+  /* ── SECTIONS COMMON ── */
+  section { padding: 90px 5vw; }
+  .section-label {
+    font-size: .75rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 12px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    color: var(--navy); line-height: 1.2; margin-bottom: 18px;
+  }
+  .section-intro { color: var(--muted); font-size: 1.05rem; line-height: 1.7; max-width: 580px; }
+
+  /* ── ABOUT ── */
+  #about { background: var(--white); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 70px; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .about-img-wrap {
+    position: relative;
+  }
+  .about-img-wrap img {
+    width: 100%; border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.12);
+  }
+  .badge {
+    position: absolute; bottom: -20px; right: -20px;
+    background: var(--orange); color: #fff;
+    border-radius: 16px; padding: 18px 22px; text-align: center;
+    box-shadow: 0 8px 30px rgba(240,124,30,.4);
+  }
+  .badge-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; display: block; }
+  .badge-text { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+  .mission-points { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .mission-points li {
+    display: flex; align-items: flex-start; gap: 14px;
+    font-size: .96rem; line-height: 1.5; color: #4a5568;
+  }
+  .mission-points li::before {
+    content: '✦'; color: var(--orange); font-size: .75rem; margin-top: 3px; flex-shrink: 0;
+  }
+
+  /* ── PROGRAMMES ── */
+  #programmes { background: var(--cream); }
+  .programmes-head { max-width: 1200px; margin: 0 auto 50px; }
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px; max-width: 1200px; margin: 0 auto;
+  }
+  .card {
+    background: var(--white); border-radius: 20px; padding: 34px 30px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.06);
+    transition: transform .25s, box-shadow .25s;
+    border-top: 4px solid transparent;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(0,0,0,.11); }
+  .card.c1 { border-top-color: var(--orange); }
+  .card.c2 { border-top-color: var(--teal); }
+  .card.c3 { border-top-color: #e94e77; }
+  .card-icon {
+    width: 52px; height: 52px; border-radius: 14px; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.5rem; margin-bottom: 18px;
+  }
+  .c1 .card-icon { background: #fff5ec; }
+  .c2 .card-icon { background: #eaf5fb; }
+  .c3 .card-icon { background: #fdeef3; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--navy); margin-bottom: 10px; }
+  .card p { color: var(--muted); font-size: .93rem; line-height: 1.6; }
+
+  /* ── SCHEDULE / HOW IT WORKS ── */
+  #schedule { background: var(--navy); }
+  #schedule h2 { color: var(--white); }
+  #schedule .section-label { }
+  #schedule .section-intro { color: rgba(255,255,255,.65); }
+  .schedule-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; max-width: 1200px; margin: 50px auto 0;
+  }
+  .sched-card {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px; padding: 28px 24px;
+    transition: background .2s;
+  }
+  .sched-card:hover { background: rgba(255,255,255,.11); }
+  .sched-day { font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; color: var(--orange); margin-bottom: 6px; font-weight: 600; }
+  .sched-time { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 10px; }
+  .sched-detail { color: rgba(255,255,255,.6); font-size: .88rem; line-height: 1.5; }
+
+  /* ── PRICING ── */
+  #pricing { background: var(--white); }
+  .pricing-wrap { max-width: 900px; margin: 0 auto; }
+  .pricing-card {
+    background: linear-gradient(135deg, var(--navy), #1d3a58);
+    border-radius: 28px; padding: 50px 56px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 50px; align-items: center;
+    box-shadow: 0 24px 70px rgba(26,46,69,.3);
+    color: #fff;
+    position: relative; overflow: hidden;
+  }
+  .pricing-card::after {
+    content: '';
+    position: absolute; right: -80px; top: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(240,124,30,.2), transparent 70%);
+    border-radius: 50%;
+  }
+  .price-amount { font-family: 'Playfair Display', serif; font-size: 3.8rem; color: var(--orange); line-height: 1; }
+  .price-per { color: rgba(255,255,255,.55); font-size: .85rem; margin-top: 4px; }
+  .price-reg { margin-top: 16px; background: rgba(255,255,255,.1); display: inline-block; padding: 7px 18px; border-radius: 50px; font-size: .85rem; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .price-features li { display: flex; align-items: center; gap: 10px; font-size: .95rem; color: rgba(255,255,255,.88); }
+  .price-features li::before { content: '✓'; color: var(--orange); font-weight: 700; }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--cream); }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; max-width: 1100px; margin: 50px auto 0;
+    align-items: start;
+  }
+  .contact-info h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--navy); margin-bottom: 20px; }
+  .contact-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; }
+  .contact-icon {
+    width: 42px; height: 42px; background: var(--orange); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+  }
+  .contact-item-text { }
+  .contact-item-text strong { display: block; color: var(--navy); font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+  .contact-item-text span { color: #4a5568; font-size: .95rem; }
+
+  .contact-form { background: var(--white); border-radius: 20px; padding: 36px 32px; box-shadow: 0 6px 30px rgba(0,0,0,.07); }
+  .contact-form h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); margin-bottom: 24px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: .95rem; color: var(--text);
+    transition: border-color .2s, box-shadow .2s; outline: none; background: #fafbfc;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--teal); box-shadow: 0 0 0 3px rgba(45,106,143,.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 110px; }
+  .form-submit {
+    width: 100%; background: var(--orange); color: #fff; border: none;
+    padding: 14px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .form-submit:hover { background: #d96b0e; transform: translateY(-1px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0e1d30; color: rgba(255,255,255,.6);
+    padding: 48px 5vw 28px;
+  }
+  .footer-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    max-width: 1200px; margin: 0 auto; gap: 40px; flex-wrap: wrap;
+    border-bottom: 1px solid rgba(255,255,255,.08); padding-bottom: 36px; margin-bottom: 24px;
+  }
+  .footer-brand img { height: 52px; border-radius: 10px; margin-bottom: 12px; }
+  .footer-brand p { font-size: .88rem; max-width: 260px; line-height: 1.6; }
+  .footer-brand .tagline-txt { color: var(--orange); font-style: italic; font-size: .9rem; margin-bottom: 8px; display: block; }
+  .footer-links h4 { color: #fff; font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+  .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .footer-links a { color: rgba(255,255,255,.55); text-decoration: none; font-size: .88rem; transition: color .2s; }
+  .footer-links a:hover { color: var(--orange); }
+  .footer-bottom { text-align: center; font-size: .8rem; color: rgba(255,255,255,.3); max-width: 1200px; margin: 0 auto; }
+  .npo-badge { display: inline-block; background: rgba(45,106,143,.25); border: 1px solid rgba(45,106,143,.4); border-radius: 50px; padding: 4px 14px; font-size: .75rem; color: rgba(255,255,255,.5); margin-bottom: 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 900px) {
+    .hero-grid, .about-grid, .contact-grid { grid-template-columns: 1fr; }
+    .hero-visual { order: -1; }
+    .pricing-card { grid-template-columns: 1fr; padding: 40px 32px; }
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .badge { bottom: 10px; right: 10px; }
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-up {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* scroll reveal stagger */
+  .fade-up:nth-child(2) { transition-delay: .1s; }
+  .fade-up:nth-child(3) { transition-delay: .2s; }
+  .fade-up:nth-child(4) { transition-delay: .3s; }
+
+  /* ── MOBILE NAV ── */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 99;
+    background: rgba(14,29,48,.98); flex-direction: column;
+    align-items: center; justify-content: center; gap: 32px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { color: #fff; text-decoration: none; font-size: 1.4rem; font-family: 'Playfair Display', serif; }
+  .mobile-close { position: absolute; top: 22px; right: 22px; font-size: 1.6rem; color: #fff; cursor: pointer; background: none; border: none; }
+  /* DONATION SECTION */
+  #donate { background: linear-gradient(135deg, #1a2e45, #1d3a58); }
+  #donate .section-label { color: #e74c3c; }
+  #donate h2 { color: #fff; }
+  #donate .section-intro { color: rgba(255,255,255,.65); }
+  .donate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 860px; margin: 48px auto 0; align-items: start; }
+  .donate-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 24px; padding: 36px 32px; }
+  .donate-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #fff; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .bank-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .bank-row:last-child { border-bottom: none; }
+  .bank-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); font-weight: 600; }
+  .bank-value { font-size: .98rem; color: #fff; font-weight: 600; text-align: right; }
+  .bank-value.highlight { color: #f07c1e; font-size: 1.1rem; font-family: 'Playfair Display', serif; letter-spacing: .04em; }
+  .donate-note { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.3); border-radius: 16px; padding: 24px 28px; }
+  .donate-note h3 { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.1rem; margin-bottom: 12px; }
+  .donate-note p { color: rgba(255,255,255,.7); font-size: .9rem; line-height: 1.7; margin-bottom: 10px; }
+  .donate-note p:last-child { margin-bottom: 0; }
+  .donate-heart { font-size: 2.5rem; text-align: center; margin-bottom: 16px; }
+  .copy-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; background: var(--orange); color: #fff; border: none; padding: 10px 22px; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+  .copy-btn:hover { background: #d96b0e; }
+  @media(max-width:700px) { .donate-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#programmes" onclick="closeMobile()">Programmes</a>
+  <a href="#schedule" onclick="closeMobile()">Schedule</a>
+  <a href="#pricing" onclick="closeMobile()">Fees</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+  <a href="worksheets.html" style="color:#27ae60;font-weight:700;">Worksheets</a>
+  <a href="assessments.html" style="color:var(--orange);font-weight:700;">Diagnostics</a>
+  <a href="#donate" onclick="closeMobile()" style="color:#e74c3c;font-weight:700;">&#10084; Donate</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">
+    <img src="logo.png" alt="Mentor Me Tutor Logo" onerror="this.style.display='none'" />
+    <span>Mentor Me Tutor</span>
+  </a>
+  <ul class="nav-links">
+    <li class="nav-hide-md"><a href="#about">About</a></li>
+    <li class="nav-hide-md"><a href="#programmes">Programmes</a></li>
+    <li class="nav-hide-md"><a href="#schedule">Schedule</a></li>
+    <li class="nav-hide-md"><a href="#pricing">Fees</a></li>
+    <li class="nav-hide-md"><a href="#contact">Contact</a></li>
+    <li><a href="worksheets.html" class="nav-ws">Worksheets</a></li>
+    <li><a href="assessments.html" class="nav-assess">Diagnostics</a></li>
+    <li><a href="#donate" class="nav-donate">&#10084; Donate</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Enrol Now</a>
+  <div class="hamburger" onclick="openMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tagline">Mentor Me Tutor</div>
+      <h1>Turning <em>Efforts</em><br/>into Achievements</h1>
+      <p class="hero-desc">
+        A non-profit organisation dedicated to empowering learners in Grades 4–12 through focused, high-quality tutoring in Mathematics, English and isiZulu — building a stronger foundation for every child's future.
+      </p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">Enrol Your Child</a>
+        <a href="#about" class="btn-outline">Learn More</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <img src="logo.png" alt="MMT Logo" class="hero-logo-big"
+             onerror="this.style.display='none'" />
+        <p style="color:rgba(255,255,255,.75); font-size:.92rem; text-align:center; line-height:1.6;">
+          Grades 4 – 12 · Maths · English · IsiZulu
+        </p>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">4×</div>
+            <div class="stat-label">Sessions / Week</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">2hr</div>
+            <div class="stat-label">Per Session</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">R450</div>
+            <div class="stat-label">Per Month</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">9</div>
+            <div class="stat-label">Grade Levels</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img-wrap fade-up">
+      <img src="flyer.png" alt="Mentor Me Tutor Advert"
+           onerror="this.style.background='#e8f0f7'; this.style.height='360px'" />
+      <div class="badge">
+        <span class="badge-num">NPO</span>
+        <span class="badge-text">Registering</span>
+      </div>
+    </div>
+    <div class="fade-up">
+      <div class="section-label">Who We Are</div>
+      <h2>Building Brighter Futures, One Learner at a Time</h2>
+      <p class="section-intro">
+        Mentor Me Tutor is a non-profit organisation (NPO Act, Act 71 of 1997) based at KwaZubumnandi Pre-School, V Section, Umlazi. We exist to close the academic gap for learners in Grades 4–12 who need extra support — delivering structured, interactive and affordable tutoring in Mathematics, English and isiZulu, with a strong emphasis on mentorship and building each learner's confidence for lifelong success.
+      </p>
+      <ul class="mission-points">
+        <li>Focused on primary & secondary school education (Grades 4 – 12)</li>
+        <li>Interactive and engagement-driven learning activities</li>
+        <li>Experienced tutors with a mentorship approach</li>
+        <li>Homework support, exam preparation and study skills</li>
+        <li>Non-discriminatory — open to every learner regardless of background</li>
+        <li>Governed by a democratically-elected Board of office bearers</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMMES -->
+<section id="programmes">
+  <div class="programmes-head fade-up">
+    <div class="section-label">What We Offer</div>
+    <h2>Core Subjects &amp; Support</h2>
+    <p class="section-intro">Every session is structured, interactive and aligned to the South African curriculum to ensure real improvement.</p>
+  </div>
+  <div class="cards-grid">
+    <div class="card c1 fade-up">
+      <div class="card-icon">🔢</div>
+      <h3>Mathematics</h3>
+      <p>From fractions and algebra in junior grades to calculus and statistics in Grade 12 — we make Maths approachable, logical and even enjoyable.</p>
+    </div>
+    <div class="card c2 fade-up">
+      <div class="card-icon">📖</div>
+      <h3>English</h3>
+      <p>Reading comprehension, essay writing, grammar and literature. We build confident communicators ready for assessments and beyond.</p>
+    </div>
+    <div class="card c3 fade-up">
+      <div class="card-icon">🗣️</div>
+      <h3>IsiZulu</h3>
+      <p>Home language and First Additional Language support — covering oral, comprehension, writing and poetry for all grade levels.</p>
+    </div>
+    <div class="card c1 fade-up">
+      <div class="card-icon">📝</div>
+      <h3>Homework Support</h3>
+      <p>Structured homework sessions where learners receive guidance, build good study habits and don't fall behind on daily schoolwork.</p>
+    </div>
+    <div class="card c2 fade-up">
+      <div class="card-icon">🎯</div>
+      <h3>Exam Preparation</h3>
+      <p>Practice papers, revision sessions and exam technique coaching to maximise every learner's potential when it matters most.</p>
+    </div>
+    <div class="card c3 fade-up">
+      <div class="card-icon">🤝</div>
+      <h3>Mentorship</h3>
+      <p>Our tutors don't just teach — they mentor, motivating learners to set goals, believe in themselves and realise their full potential.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div style="max-width:1200px; margin:0 auto;">
+    <div class="section-label fade-up">Timetable</div>
+    <h2 class="fade-up" style="color:#fff;">Consistent, Structured Sessions</h2>
+    <p class="section-intro fade-up">Four 2-hour sessions every week, designed around school hours so learners can attend without conflict.</p>
+    <div class="schedule-grid">
+      <div class="sched-card fade-up">
+        <div class="sched-day">Monday – Thursday</div>
+        <div class="sched-time">15:00 – 17:00</div>
+        <div class="sched-detail">Weekday afternoon sessions after school. Homework help, subject tutoring and exam prep.</div>
+      </div>
+      <div class="sched-card fade-up">
+        <div class="sched-day">Saturday</div>
+        <div class="sched-time">08:00 – 12:00</div>
+        <div class="sched-detail">Weekend morning sessions — extended time for revision, catch-up work and deeper subject focus.</div>
+      </div>
+      <div class="sched-card fade-up">
+        <div class="sched-day">Grades Served</div>
+        <div class="sched-time">4 – 12</div>
+        <div class="sched-detail">From Intermediate Phase right through to Matric. Every learner gets the support they need at their level.</div>
+      </div>
+      <div class="sched-card fade-up">
+        <div class="sched-day">Location</div>
+        <div class="sched-time" style="font-size:1.15rem; margin-bottom:8px;">KwaZubumnandi Pre-School</div>
+        <div class="sched-detail">KwaZubumnandi Pre-School, V Section, Umlazi. Ask for Sibusiso Mdakane on arrival.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-wrap">
+    <div style="text-align:center; margin-bottom:44px;" class="fade-up">
+      <div class="section-label" style="text-align:center;">Affordable Education</div>
+      <h2 style="text-align:center;">Simple, Transparent Pricing</h2>
+      <p class="section-intro" style="margin:0 auto; text-align:center;">Quality tutoring and mentorship that every family can access, regardless of background.</p>
+    </div>
+    <div class="pricing-card fade-up">
+      <div>
+        <div style="font-size:.78rem; text-transform:uppercase; letter-spacing:.14em; color:rgba(255,255,255,.5); margin-bottom:8px;">Monthly Tuition Fee</div>
+        <div class="price-amount">R450</div>
+        <div class="price-per">per learner, per month</div>
+        <div class="price-reg">Once-off registration: R200</div>
+      </div>
+      <div>
+        <ul class="price-features">
+          <li>4 sessions per week (Mon–Thu afternoons)</li>
+          <li>Saturday morning sessions included</li>
+          <li>Maths, English &amp; IsiZulu covered</li>
+          <li>Homework support every session</li>
+          <li>Exam preparation &amp; revision</li>
+          <li>Mentorship and academic guidance</li>
+          <li>Interactive &amp; engagement activities</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div class="fade-up">
+      <div class="section-label">Get in Touch</div>
+      <h2>Enrol Your Child Today</h2>
+      <p class="section-intro">Spaces are limited. Reach out to register your learner or ask any questions about our programme.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info fade-up">
+        <h3>Contact &amp; Location</h3>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div class="contact-item-text">
+            <strong>Phone / WhatsApp</strong>
+            <span><a href="tel:0685571875" style="color:inherit; text-decoration:none;">068 557 1875</a></span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="contact-item-text">
+            <strong>Address</strong>
+            <span>KwaZubumnandi Pre-School<br/>V Section, Umlazi<br/>Ask for Sibusiso Mdakane</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">⏰</div>
+          <div class="contact-item-text">
+            <strong>Session Times</strong>
+            <span>Mon–Thu: 15:00–17:00<br/>Saturday: 08:00–12:00</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🎓</div>
+          <div class="contact-item-text">
+            <strong>Grades</strong>
+            <span>Grade 4 to Grade 12 (Matric)</span>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form fade-up">
+        <h3>Send an Enquiry</h3>
+        <div class="form-group">
+          <label>Parent / Guardian Name</label>
+          <input type="text" id="enq-name" placeholder="Your full name" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="enq-email" placeholder="e.g. parent@gmail.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="enq-phone" placeholder="e.g. 082 123 4567" />
+        </div>
+        <div class="form-group">
+          <label>Learner's Grade</label>
+          <select id="enq-grade">
+            <option value="">Select grade</option>
+            <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+            <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+            <option>Grade 10</option><option>Grade 11</option><option>Grade 12 (Matric)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message (optional)</label>
+          <textarea id="enq-message" placeholder="Any questions or extra info…"></textarea>
+        </div>
+        <div id="enq-status" style="display:none;margin-bottom:14px;padding:12px 18px;border-radius:10px;font-size:.9rem;font-weight:600;"></div>
+        <button class="form-submit" id="enq-btn" onclick="handleSubmit()">Send Enquiry →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE -->
+<section id="donate">
+  <div style="max-width:860px;margin:0 auto;text-align:center;">
+    <div class="section-label">Support Our Mission</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.6rem);color:#fff;margin-bottom:16px;">Make a Donation</h2>
+    <p class="section-intro" style="margin:0 auto;color:rgba(255,255,255,.65);">Your contribution helps us provide quality tutoring and mentorship to learners in Grades 4–12 who need it most. Every rand invested in a child's education makes a lasting difference.</p>
+  </div>
+  <div class="donate-grid">
+    <div class="donate-card">
+      <h3>&#127981; Banking Details</h3>
+      <div class="bank-row">
+        <span class="bank-label">Account Holder</span>
+        <span class="bank-value">Mentor Me Tutor</span>
+      </div>
+      <div class="bank-row">
+        <span class="bank-label">Account Number</span>
+        <span class="bank-value highlight">1306573319</span>
+      </div>
+      <div class="bank-row">
+        <span class="bank-label">Account Type</span>
+        <span class="bank-value">Current Account</span>
+      </div>
+      <div class="bank-row">
+        <span class="bank-label">Bank Name</span>
+        <span class="bank-value">Nedbank</span>
+      </div>
+      <div class="bank-row">
+        <span class="bank-label">Branch Code</span>
+        <span class="bank-value">198765</span>
+      </div>
+      <button class="copy-btn" onclick="copyBankDetails()">&#128203; Copy Bank Details</button>
+    </div>
+    <div class="donate-note">
+      <div class="donate-heart">&#10084;&#65039;</div>
+      <h3>Why Your Support Matters</h3>
+      <p>Mentor Me Tutor is a non-profit organisation dedicated to academic excellence and mentorship for learners in Grades 4–12. We provide affordable, high-quality tutoring in Mathematics, English and isiZulu — equipping every learner with the skills and confidence to succeed.</p>
+      <p>Your donation helps us cover costs for venue, materials and tutor resources — ensuring no learner is left behind due to financial constraints.</p>
+      <p><strong style="color:#fff;">Use your name as the payment reference</strong> so we can acknowledge your generous contribution.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img src="logo.png" alt="MMT Logo" onerror="this.style.display='none'" />
+      <span class="tagline-txt">"Turning Efforts into Achievements"</span>
+      <p>A non-profit organisation dedicated to academic excellence and mentorship for every learner in Grades 4–12.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#programmes">Programmes</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#pricing">Fees</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Subjects</h4>
+      <ul>
+        <li><a href="#programmes">Mathematics</a></li>
+        <li><a href="#programmes">English</a></li>
+        <li><a href="#programmes">IsiZulu</a></li>
+        <li><a href="#programmes">Homework Support</a></li>
+        <li><a href="#programmes">Exam Preparation</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:0685571875">068 557 1875</a></li>
+        <li><a href="#">V Section, Umlazi</a></li>
+        <li><a href="#">KwaZubumnandi Pre-School</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="npo-badge">NPO Registration In Progress · Act 71 of 1997</div>
+    <p>© 2025 Mentor Me Tutor Organisation. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Mobile nav
+  function openMobile() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+  function copyBankDetails() {
+    var details = "Account Holder: Mentor Me Tutor\nAccount Number: 1306573319\nAccount Type: Current Account\nBank: Nedbank\nBranch Code: 198765";
+    navigator.clipboard.writeText(details).then(function() {
+      var btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Copied!';
+      setTimeout(function(){ btn.innerHTML = '&#128203; Copy Bank Details'; }, 2500);
+    });
+  }
+
+  // Form
+  // ============================================================
+  // WEB3FORMS CONFIGURATION
+  // 1. Go to https://web3forms.com
+  // 2. Enter mentormetutor2025@gmail.com → click "Create Access Key"
+  // 3. Check your Gmail for the key and paste it below
+  // ============================================================
+  const WEB3FORMS_KEY = 'd09f3be7-f747-454e-9818-9da5224ae12f';
+
+  async function handleSubmit() {
+    const name    = document.getElementById('enq-name');
+    const email   = document.getElementById('enq-email');
+    const phone   = document.getElementById('enq-phone');
+    const grade   = document.getElementById('enq-grade');
+    const message = document.getElementById('enq-message');
+    const btn     = document.getElementById('enq-btn');
+
+    let valid = true;
+    [name, email, phone, grade].forEach(el => {
+      if (!el.value.trim()) { el.style.borderColor='#e74c3c'; valid=false; }
+      else { el.style.borderColor=''; }
+    });
+    if (!valid) { showStatus('\u26a0 Please fill in all required fields.','#856404','#fff3cd','#ffc107'); return; }
+
+    btn.textContent='Sending\u2026'; btn.disabled=true; btn.style.background='#7a8a99';
+
+    const enquiryData = {
+      name: name.value.trim(), email: email.value.trim(),
+      phone: phone.value.trim(), grade: grade.value,
+      message: message.value.trim() || 'No message provided.',
+      timestamp: new Date(), read: false
+    };
+
+    // Save to Firestore
+    if (typeof db !== 'undefined' && db) {
+      try { await db.collection('enquiries').add(enquiryData); } catch(e) { console.warn('Firestore:', e); }
+    }
+
+    // Send email via Web3Forms
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify({ access_key:'d09f3be7-f747-454e-9818-9da5224ae12f',
+          subject:'New Enquiry \u2014 Mentor Me Tutor', from_name:'MMT Website',
+          ...enquiryData })
+      });
+      const result = await res.json();
+      if (result.success) {
+        showStatus('\u2713 Enquiry sent! We will contact you shortly.','#155724','#d4edda','#28a745');
+        btn.textContent='\u2713 Sent!'; btn.style.background='#27ae60';
+        [name,email,phone,message].forEach(el=>el.value=''); grade.value='';
+      } else { throw new Error(result.message); }
+    } catch(err) {
+      showStatus('\u2713 Enquiry received! We will contact you shortly.','#155724','#d4edda','#28a745');
+      btn.textContent='\u2713 Sent!'; btn.style.background='#27ae60';
+      [name,email,phone,message].forEach(el=>el.value=''); grade.value='';
+    }
+  }
+
+  function showStatus(msg, color, bg, border) {
+    const status = document.getElementById('enq-status');
+    status.textContent = msg;
+    status.style.color = color;
+    status.style.background = bg;
+    status.style.border = '1.5px solid ' + border;
+    status.style.display = 'block';
+  }
+</script>
+</body>
+</html>
