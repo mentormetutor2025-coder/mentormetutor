@@ -958,21 +958,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(26,46,69,.97
 </div><!-- end #assessment-content -->
 
 <script>
-// ── Restore student session from worksheets login ────
-(function() {
-  var sess = sessionStorage.getItem('mmtStudent');
-  if (sess) {
-    try {
-      var s = JSON.parse(sess);
-      // Create hidden spans so Firestore save can read them
-      if (!document.getElementById('loggedInName')) {
-        var n = document.createElement('span'); n.id='loggedInName'; n.textContent=s.name||''; n.style.display='none'; document.body.appendChild(n);
-        var u = document.createElement('span'); u.id='loggedInNum';  u.textContent=s.num||'';  u.style.display='none'; document.body.appendChild(u);
-      }
-    } catch(e) {}
-  }
-})();
-
 function startAssessment() {
   var valid = true;
 
@@ -1373,23 +1358,24 @@ function submitAssessment(sid) {
   banner.className = "result-banner show " + fb.cls;
   banner.scrollIntoView({ behavior:"smooth", block:"start" });
 
-  // ── Save result to Firestore ─────────────────────────
-  if (typeof fbReady === 'function' && fbReady()) {
-    var phaseMap = {'int':'Intermediate Phase','sen':'Senior Phase','fet':'FET Phase'};
-    var subjMap  = {'en':'English','math':'Mathematics','zu':'isiZulu','ns':'Natural Sciences'};
-    var parts    = sid.split('-');
-    var saveData = {
-      studentNumber: (document.getElementById('loggedInNum')  || {textContent:''}).textContent || 'Unknown',
-      studentName:   (document.getElementById('loggedInName') || {textContent:''}).textContent || 'Unknown',
-      assessmentId:  sid,
-      phase:  phaseMap[parts[0]] || parts[0],
-      subject: subjMap[parts[1]] || parts[1],
-      grade:  (phaseMap[parts[0]]==='Intermediate Phase'?'Grades 4–7':phaseMap[parts[0]]==='Senior Phase'?'Grades 8–9':'Grades 10–12'),
-      mcScore: mcScore, mcTotal: mcTotal, shortTotal: shortTotal,
-      percentage: pct,
-      timestamp: new Date()
-    };
-    db.collection('assessmentResults').add(saveData).catch(function(e){ console.warn('Could not save result:', e); });
+  // Save result to Firestore
+  if (typeof db !== 'undefined' && db) {
+    try {
+      var phaseMap = {'int':'Intermediate Phase','sen':'Senior Phase','fet':'FET Phase'};
+      var subjMap  = {'en':'English','math':'Mathematics','zu':'isiZulu','ns':'Natural Sciences'};
+      var parts = sid.split('-');
+      var sName = (document.getElementById('badge-name')  || {textContent:''}).textContent || 'Unknown';
+      var sNum  = (document.getElementById('badge-grade') || {textContent:''}).textContent || '';
+      db.collection('assessmentResults').add({
+        studentName:  sName,
+        assessmentId: sid,
+        phase:   phaseMap[parts[0]] || parts[0],
+        subject: subjMap[parts[1]]  || parts[1],
+        mcScore: mcScore, mcTotal: mcTotal, shortTotal: shortTotal,
+        percentage: pct,
+        timestamp: new Date()
+      });
+    } catch(e) { console.warn('Score save failed:', e); }
   }
 
   // Toggle buttons
