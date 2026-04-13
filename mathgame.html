@@ -1114,22 +1114,11 @@ function getStudentInfo() {
   return { name: 'Student', num: 'Unknown', grade: '' };
 }
 
-function getStudentInfo() {
-  try {
-    var sess = sessionStorage.getItem('mmtStudent');
-    if (sess) {
-      var s = JSON.parse(sess);
-      return { name: s.name || 'Student', num: s.num || 'Unknown', grade: s.grade || '' };
-    }
-  } catch(e) {}
-  return { name: 'Student', num: 'Unknown', grade: '' };
-}
-
 function endGame() {
   clearTimer();
   playSound('complete');
 
-  // ── Save score to Firestore ─────────────────────────
+  // ── Save score to Firebase Firestore ─────────────────
   if (typeof db !== 'undefined' && db) {
     try {
       var student = getStudentInfo();
@@ -1149,6 +1138,7 @@ function endGame() {
         level:          G.level,
         timestamp:      new Date()
       });
+      console.log('Score saved to Firebase!');
     } catch(e) { console.warn('Score save failed:', e); }
   }
 
