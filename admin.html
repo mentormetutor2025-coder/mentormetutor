@@ -23,8 +23,8 @@ body{font-family:"DM Sans",sans-serif;background:var(--cream);color:var(--text);
 .login-field label{display:block;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);margin-bottom:5px;}
 .login-field input{width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.92rem;outline:none;transition:border-color .2s;}
 .login-field input:focus{border-color:var(--teal);}
-.login-error{background:#f8d7da;border:1px solid #f5c6cb;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#721c24;margin-bottom:12px;display:none;}
-.login-error.show{display:block;}
+.login-error{background:#f8d7da;border:1px solid #f5c6cb;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#721c24;margin-bottom:12px;display:none;line-height:1.5;word-break:break-word;}
+.login-error.show{display:block !important;}
 .login-btn{width:100%;background:var(--navy);color:#fff;border:none;padding:13px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;}
 .login-btn:hover{background:#253f5c;}
 /* ── DASHBOARD ── */
@@ -271,46 +271,50 @@ async function doAdminLogin() {
   var errEl   = document.getElementById('loginErr');
   var btn     = document.getElementById('loginBtn');
 
-  var email = (emailEl ? emailEl.value : '').trim();
-  var pw    = (pwEl    ? pwEl.value    : '').trim();
+  var email = emailEl ? emailEl.value.trim() : '';
+  var pw    = pwEl    ? pwEl.value.trim()    : '';
 
-  errEl.style.display = 'none';
+  // Always hide error first
+  errEl.style.cssText = 'display:none !important';
 
-  if (!email) { errEl.textContent='Please enter your email address.'; errEl.style.display='block'; return; }
-  if (!pw)    { errEl.textContent='Please enter your password.';       errEl.style.display='block'; return; }
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.style.cssText = 'display:block !important; background:#f8d7da; border:1px solid #f5c6cb; border-radius:8px; padding:10px 14px; font-size:.85rem; color:#721c24; margin-bottom:12px; line-height:1.6; word-break:break-word;';
+    errEl.classList.add('show');
+    if (btn) { btn.textContent = 'Login to Dashboard'; btn.disabled = false; }
+  }
 
+  if (!email) { showError('Please enter your email address.'); return; }
+  if (!pw)    { showError('Please enter your password.');       return; }
+
+  // Check Firebase loaded
   if (typeof firebase === 'undefined') {
-    errEl.textContent='Firebase failed to load. Please refresh the page.';
-    errEl.style.display='block'; return;
+    showError('Firebase failed to load. Make sure firebase-config.js is uploaded to GitHub and refresh the page.');
+    return;
   }
   if (typeof auth === 'undefined' || !auth) {
-    errEl.textContent='Firebase Auth not ready. Please refresh the page and try again.';
-    errEl.style.display='block'; return;
+    showError('Firebase Auth is not ready. Please refresh the page and try again.');
+    return;
   }
 
-  if (btn) { btn.textContent='Logging in...'; btn.disabled=true; }
+  if (btn) { btn.textContent = 'Logging in...'; btn.disabled = true; }
 
   try {
     await auth.signInWithEmailAndPassword(email, pw);
+    // Success — onAuthStateChanged will show dashboard
   } catch(e) {
-    if (btn) { btn.textContent='Login to Dashboard'; btn.disabled=false; }
-    console.error('Login error code:', e.code);
-    var msg = 'Login failed. Error: ' + (e.code || 'unknown');
-    if (e.code==='auth/invalid-credential' || e.code==='auth/wrong-password' || e.code==='auth/user-not-found') {
-      msg = 'Email or password is incorrect. Please check and try again.';
-    } else if (e.code==='auth/too-many-requests') {
-      msg = 'Too many attempts. Please wait 5 minutes before trying again.';
-    } else if (e.code==='auth/unauthorized-domain') {
-      msg = 'Domain not authorised in Firebase. Go to Firebase > Authentication > Settings > Authorised Domains > Add: mentormetutor2025-coder.github.io';
-    } else if (e.code==='auth/network-request-failed') {
-      msg = 'Network error. Please check your internet connection.';
-    } else if (e.code==='auth/invalid-email') {
-      msg = 'The email address format is not valid.';
-    } else if (e.code==='auth/user-disabled') {
-      msg = 'This account is disabled. Please go to Firebase and re-enable it.';
-    }
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
+    console.error('Firebase login error:', e.code, e.message);
+    var msg = '';
+    if      (e.code === 'auth/invalid-credential')      { msg = 'Incorrect email or password. Go to Firebase > Authentication > Users, delete the user and create it again with password: MMTadmin2026'; }
+    else if (e.code === 'auth/wrong-password')          { msg = 'Wrong password. Go to Firebase > Authentication > Users and reset it.'; }
+    else if (e.code === 'auth/user-not-found')          { msg = 'No account found. Go to Firebase > Authentication > Users > Add User and create the admin account.'; }
+    else if (e.code === 'auth/too-many-requests')       { msg = 'Too many failed attempts. Please wait 5 minutes then try again.'; }
+    else if (e.code === 'auth/unauthorized-domain')     { msg = 'Domain not authorised. Go to Firebase > Authentication > Settings > Authorised Domains > Add: mentormetutor2025-coder.github.io'; }
+    else if (e.code === 'auth/network-request-failed')  { msg = 'No internet connection. Please check your connection and try again.'; }
+    else if (e.code === 'auth/invalid-email')           { msg = 'Invalid email format. Please check the email address.'; }
+    else if (e.code === 'auth/user-disabled')           { msg = 'This account is disabled. Go to Firebase > Authentication > Users and re-enable it.'; }
+    else                                                 { msg = 'Login error: ' + (e.code || '') + ' — ' + (e.message || 'Unknown error. Please try again.'); }
+    showError(msg);
   }
 }
 
