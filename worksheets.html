@@ -2647,7 +2647,7 @@ const STUDENT_NAMES = {
   'ADMIN-001'   : 'Administrator',
 };
 
-async async function doLogin() {
+async function doLogin() {
   var numInput = document.getElementById('loginStudentNum');
   var pwInput  = document.getElementById('loginPassword');
   var errBox   = document.getElementById('loginError');
@@ -2663,68 +2663,80 @@ async async function doLogin() {
   if (!num) { numInput.classList.add('error'); return; }
   if (!pw)  { pwInput.classList.add('error');  return; }
 
-  var origText = btn.textContent;
-  btn.textContent = 'Checking…';
+  btn.textContent = 'Checking...';
   btn.disabled = true;
 
   var matched = false;
   var studentData = null;
 
-  // Try Firestore first
-  if (typeof db !== 'undefined' && db) {
-    try {
-      var snap = await db.collection('students')
-        .where('studentNumber', '==', num).get();
-      if (!snap.empty) {
-        var doc = snap.docs[0].data();
-        if (doc.password === pw && doc.active !== false) {
-          matched = true;
-          studentData = {
-            name:  doc.name || ((doc.firstName||'') + ' ' + (doc.surname||'')).trim() || num,
-            num:   num,
-            grade: doc.grade || ''
-          };
-        }
-      }
-    } catch(e) { console.warn('Firestore login failed, using local fallback:', e); }
-  }
-
-  // Fallback to hardcoded STUDENTS list
-  if (!matched && typeof STUDENTS !== 'undefined' && STUDENTS[num] && STUDENTS[num] === pw) {
+  // STEP 1: Check hardcoded list first (always works, no internet needed)
+  if (typeof STUDENTS !== 'undefined' && STUDENTS[num] && STUDENTS[num] === pw) {
     matched = true;
     studentData = {
-      name:  (typeof STUDENT_NAMES !== 'undefined' ? STUDENT_NAMES[num] : null) || num,
+      name:  (typeof STUDENT_NAMES !== 'undefined' && STUDENT_NAMES[num]) ? STUDENT_NAMES[num] : num,
       num:   num,
       grade: ''
     };
   }
 
-  btn.textContent = origText;
+  // STEP 2: Check Firestore (gets latest passwords and grade info)
+  if (typeof db !== 'undefined' && db) {
+    try {
+      var snap = await db.collection('students')
+        .where('studentNumber', '==', num).get();
+      if (!snap.empty) {
+        var docData = snap.docs[0].data();
+        if (docData.password === pw && docData.active !== false) {
+          matched = true;
+          var fullName = docData.name || '';
+          if (!fullName && docData.firstName) {
+            fullName = (docData.firstName + ' ' + (docData.surname || '')).trim();
+          }
+          studentData = { name: fullName || num, num: num, grade: docData.grade || '' };
+        } else if (docData.studentNumber === num && docData.password !== pw) {
+          matched = false;
+          studentData = null;
+        }
+      }
+    } catch(e) {
+      console.warn('Firestore check skipped:', e.message);
+    }
+  }
+
+  // Restore button
+  btn.textContent = 'Access Worksheets';
   btn.disabled = false;
 
   if (matched && studentData) {
-    // Store in sessionStorage so games can read the student name
-    sessionStorage.setItem('mmtStudent', JSON.stringify(studentData));
+    // Save student info for games to use
+    try { sessionStorage.setItem('mmtStudent', JSON.stringify(studentData)); } catch(e) {}
 
     document.getElementById('loginGate').classList.add('hidden');
     document.getElementById('pageContent').classList.add('unlocked');
 
     var bar = document.getElementById('loggedInBar');
-    bar.classList.add('show');
-    document.getElementById('loggedInName').textContent = studentData.name;
-    document.getElementById('loggedInNum').textContent  = studentData.num;
+    if (bar) bar.classList.add('show');
+
+    var nameEl = document.getElementById('loggedInName');
+    var numEl  = document.getElementById('loggedInNum');
+    if (nameEl) nameEl.textContent = studentData.name;
+    if (numEl)  numEl.textContent  = studentData.num;
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
   } else {
+    // Show error
     numInput.classList.add('error');
     pwInput.classList.add('error');
     errBox.classList.add('show');
     pwInput.value = '';
     pwInput.focus();
     var box = document.querySelector('.login-box');
-    box.style.animation = 'none';
-    box.offsetHeight;
-    box.style.animation = 'shake 0.4s ease';
+    if (box) {
+      box.style.animation = 'none';
+      void box.offsetHeight;
+      box.style.animation = 'shake 0.4s ease';
+    }
   }
 }
 
