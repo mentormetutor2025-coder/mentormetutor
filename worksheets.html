@@ -2652,91 +2652,51 @@ async function doLogin() {
   var pwInput  = document.getElementById('loginPassword');
   var errBox   = document.getElementById('loginError');
   var btn      = document.getElementById('loginBtn');
-
   var num = numInput.value.trim().toUpperCase();
   var pw  = pwInput.value.trim();
-
-  numInput.classList.remove('error');
-  pwInput.classList.remove('error');
-  errBox.classList.remove('show');
-
+  numInput.classList.remove('error'); pwInput.classList.remove('error'); errBox.classList.remove('show');
   if (!num) { numInput.classList.add('error'); return; }
   if (!pw)  { pwInput.classList.add('error');  return; }
-
-  btn.textContent = 'Checking...';
-  btn.disabled = true;
-
-  var matched = false;
-  var studentData = null;
-
-  // STEP 1: Check hardcoded list first (always works, no internet needed)
+  btn.textContent = 'Checking...'; btn.disabled = true;
+  var matched = false; var studentData = null;
+  // STEP 1: Hardcoded list (always works)
   if (typeof STUDENTS !== 'undefined' && STUDENTS[num] && STUDENTS[num] === pw) {
     matched = true;
-    studentData = {
-      name:  (typeof STUDENT_NAMES !== 'undefined' && STUDENT_NAMES[num]) ? STUDENT_NAMES[num] : num,
-      num:   num,
-      grade: ''
-    };
+    studentData = { name: (typeof STUDENT_NAMES !== 'undefined' && STUDENT_NAMES[num]) ? STUDENT_NAMES[num] : num, num: num, grade: '' };
   }
-
-  // STEP 2: Check Firestore (gets latest passwords and grade info)
+  // STEP 2: Firestore (gets updated passwords and grade)
   if (typeof db !== 'undefined' && db) {
     try {
-      var snap = await db.collection('students')
-        .where('studentNumber', '==', num).get();
+      var snap = await db.collection('students').where('studentNumber','==',num).get();
       if (!snap.empty) {
         var docData = snap.docs[0].data();
         if (docData.password === pw && docData.active !== false) {
           matched = true;
-          var fullName = docData.name || '';
-          if (!fullName && docData.firstName) {
-            fullName = (docData.firstName + ' ' + (docData.surname || '')).trim();
-          }
-          studentData = { name: fullName || num, num: num, grade: docData.grade || '' };
+          var fullName = docData.name || ((docData.firstName||'') + ' ' + (docData.surname||'')).trim() || num;
+          studentData = { name: fullName, num: num, grade: docData.grade || '' };
         } else if (docData.studentNumber === num && docData.password !== pw) {
-          matched = false;
-          studentData = null;
+          matched = false; studentData = null;
         }
       }
-    } catch(e) {
-      console.warn('Firestore check skipped:', e.message);
-    }
+    } catch(e) { console.warn('Firestore check skipped:', e.message); }
   }
-
-  // Restore button
-  btn.textContent = 'Access Worksheets';
-  btn.disabled = false;
-
+  btn.textContent = 'Access Worksheets'; btn.disabled = false;
   if (matched && studentData) {
-    // Save student info for games to use
     try { sessionStorage.setItem('mmtStudent', JSON.stringify(studentData)); } catch(e) {}
-
     document.getElementById('loginGate').classList.add('hidden');
     document.getElementById('pageContent').classList.add('unlocked');
-
     var bar = document.getElementById('loggedInBar');
     if (bar) bar.classList.add('show');
-
     var nameEl = document.getElementById('loggedInName');
     var numEl  = document.getElementById('loggedInNum');
     if (nameEl) nameEl.textContent = studentData.name;
     if (numEl)  numEl.textContent  = studentData.num;
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
   } else {
-    // Show error
-    numInput.classList.add('error');
-    pwInput.classList.add('error');
-    errBox.classList.add('show');
-    pwInput.value = '';
-    pwInput.focus();
+    numInput.classList.add('error'); pwInput.classList.add('error'); errBox.classList.add('show');
+    pwInput.value = ''; pwInput.focus();
     var box = document.querySelector('.login-box');
-    if (box) {
-      box.style.animation = 'none';
-      void box.offsetHeight;
-      box.style.animation = 'shake 0.4s ease';
-    }
+    if (box) { box.style.animation = 'none'; void box.offsetHeight; box.style.animation = 'shake 0.4s ease'; }
   }
 }
 
@@ -2838,6 +2798,46 @@ function submitWorksheet(wid) {
   document.getElementById('wssub-' + wid).disabled = true;
   document.getElementById('wsrst-' + wid).classList.add('show');
   document.getElementById('wsdl-' + wid).classList.add('show');
+
+  // Save worksheet result to Firestore
+  if (typeof db !== 'undefined' && db) {
+    try {
+      var student = { name: 'Student', num: 'Unknown', grade: '' };
+      try {
+        var sess = sessionStorage.getItem('mmtStudent');
+        if (sess) { var s = JSON.parse(sess); student = { name: s.name||'Student', num: s.num||'Unknown', grade: s.grade||'' }; }
+      } catch(e) {}
+
+      // Get worksheet title from the modal header
+      var modal = document.getElementById('modal-' + wid);
+      var titleEl = modal ? modal.querySelector('.ws-modal-title, h2, h3') : null;
+      var wsTitle = titleEl ? titleEl.textContent.trim() : wid;
+
+      // Map wid prefix to subject and phase
+      var subjectMap = { i:'Intermediate', s:'Senior', f:'FET' };
+      var subjMap2   = { m:'Mathematics', e:'English', z:'isiZulu', n:'Natural Sciences' };
+      var phaseCode  = wid.charAt(0);
+      var subjCode   = wid.charAt(1);
+      var phase   = phaseCode==='i'?'Intermediate Phase':phaseCode==='s'?'Senior Phase':'FET Phase';
+      var subject = subjCode==='m'?'Mathematics':subjCode==='e'?'English':subjCode==='z'?'isiZulu':'Natural Sciences';
+
+      db.collection('worksheetResults').add({
+        studentName:   student.name,
+        studentNumber: student.num,
+        grade:         student.grade,
+        worksheetId:   wid,
+        worksheetTitle: wsTitle,
+        subject:       subject,
+        phase:         phase,
+        mcScore:       mcScore,
+        mcTotal:       mcTotal,
+        shortTotal:    shortTotal,
+        percentage:    pct,
+        timestamp:     new Date()
+      });
+      console.log('Worksheet result saved to Firebase!');
+    } catch(e) { console.warn('Could not save worksheet result:', e); }
+  }
 }
 
 function getWSFeedback(pct) {

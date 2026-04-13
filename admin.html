@@ -149,6 +149,7 @@ tr:hover td{background:#fafbfd;}
     <button class="tab-btn" onclick="switchTab('results',this)">📝 Results</button>
     <button class="tab-btn" onclick="switchTab('leaderboard',this)">🎮 Leaderboard</button>
     <button class="tab-btn" onclick="switchTab('students',this)">👥 Students</button>
+    <button class="tab-btn" onclick="switchTab('wsresults',this)">📋 Worksheet Results</button>
   </div>
 
   <div class="dash-content">
@@ -205,6 +206,24 @@ tr:hover td{background:#fafbfd;}
       <div class="table-wrap" id="studentsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
     </div>
 
+
+    <!-- ══ WORKSHEET RESULTS ══ -->
+    <div class="tab-panel" id="panel-wsresults">
+      <div class="section-hdr">
+        <div class="section-title">Worksheet Results</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input class="search-input" id="wsSearch" placeholder="Search by name or subject..." oninput="filterWsResults()" style="min-width:200px;"/>
+          <select id="wsSubjectFilter" onchange="filterWsResults()" style="padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;">
+            <option value="all">All Subjects</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="English">English</option>
+            <option value="isiZulu">isiZulu</option>
+            <option value="Natural Sciences">Natural Sciences</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap" id="wsResultsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
   </div><!-- /dash-content -->
 </div><!-- /dashboard -->
 
@@ -260,7 +279,7 @@ tr:hover td{background:#fafbfd;}
 // ════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════
-let ALL_ENQUIRIES = [], ALL_RESULTS = [], ALL_SCORES = [], ALL_STUDENTS = [];
+let ALL_ENQUIRIES = [], ALL_RESULTS = [], ALL_SCORES = [], ALL_STUDENTS = [], ALL_WS_RESULTS = [];
 
 // ════════════════════════════════════════════════════════
 // AUTH
@@ -307,7 +326,7 @@ function switchTab(id, btn) {
 // LOAD ALL DATA
 // ════════════════════════════════════════════════════════
 async function loadAllData() {
-  await Promise.all([loadEnquiries(), loadResults(), loadScores(), loadStudents()]);
+  await Promise.all([loadEnquiries(), loadResults(), loadScores(), loadStudents(), loadWsResults()]);
   renderOverview();
 }
 
@@ -355,6 +374,7 @@ function renderOverview() {
     <div class="stat-card green"><div class="stat-num">${ALL_STUDENTS.length}</div><div class="stat-lbl">👥 Students</div></div>
     <div class="stat-card blue"><div class="stat-num">${ALL_RESULTS.length}</div><div class="stat-lbl">📝 Assessments Done</div></div>
     <div class="stat-card purple"><div class="stat-num">${ALL_SCORES.length}</div><div class="stat-lbl">🎮 Game Plays</div></div>
+    <div class="stat-card"><div class="stat-num">${ALL_WS_RESULTS.length}</div><div class="stat-lbl">📋 Worksheet Attempts</div></div>
   `;
 }
 
@@ -585,6 +605,66 @@ async function deleteStudent(id, num) {
   await db.collection('students').doc(id).delete();
   ALL_STUDENTS = ALL_STUDENTS.filter(s=>s.id!==id);
   filterStudents(); renderOverview();
+}
+
+
+// ════════════════════════════════════════════════════════
+// WORKSHEET RESULTS
+// ════════════════════════════════════════════════════════
+async function loadWsResults() {
+  try {
+    const snap = await db.collection('worksheetResults').orderBy('timestamp','desc').limit(500).get();
+    ALL_WS_RESULTS = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderWsResultsTable(ALL_WS_RESULTS);
+  } catch(e) { document.getElementById('wsResultsTable').innerHTML = errBox('Could not load worksheet results: '+e.message); }
+}
+
+function renderWsResultsTable(data) {
+  if (!data.length) {
+    document.getElementById('wsResultsTable').innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>No worksheet results yet.<br/><small style="color:#aaa">Results appear here when students submit a worksheet online.</small></p></div>';
+    return;
+  }
+  let rows = data.map(r => {
+    const pct = r.percentage || (r.mcTotal > 0 ? Math.round(r.mcScore/r.mcTotal*100) : 0);
+    const color = pct>=75?'badge-green':pct>=50?'badge-orange':'badge-red';
+    return '<tr>' +
+      '<td><strong>' + esc(r.studentName||'') + '</strong><br/><span style="font-size:.75rem;color:var(--muted)">' + esc(r.studentNumber||'') + '</span></td>' +
+      '<td>' + esc(r.subject||'') + '</td>' +
+      '<td>' + esc(r.phase||'') + '</td>' +
+      '<td>' + esc(r.grade||'—') + '</td>' +
+      '<td>' + esc(r.worksheetTitle||r.worksheetId||'') + '</td>' +
+      '<td><span class="badge ' + color + '">' + (r.mcScore||0) + '/' + (r.mcTotal||0) + ' (' + pct + '%)</span></td>' +
+      '<td>' + (r.shortTotal>0 ? '<span style="font-size:.78rem;color:var(--muted)">+' + r.shortTotal + ' written (tutor)</span>' : '—') + '</td>' +
+      '<td>' + fmtDate(r.timestamp) + '</td>' +
+      '<td><button class="btn btn-danger" onclick="deleteWsResult('' + r.id + '')">🗑</button></td>' +
+      '</tr>';
+  }).join('');
+  document.getElementById('wsResultsTable').innerHTML =
+    '<table><thead><tr>' +
+    '<th>Learner</th><th>Subject</th><th>Phase</th><th>Grade</th>' +
+    '<th>Worksheet</th><th>Score</th><th>Written</th><th>Date</th><th></th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function filterWsResults() {
+  const q    = (document.getElementById('wsSearch').value||'').toLowerCase();
+  const subj = document.getElementById('wsSubjectFilter').value;
+  renderWsResultsTable(ALL_WS_RESULTS.filter(r => {
+    const matchQ = !q ||
+      (r.studentName||'').toLowerCase().includes(q) ||
+      (r.studentNumber||'').toLowerCase().includes(q) ||
+      (r.subject||'').toLowerCase().includes(q) ||
+      (r.worksheetTitle||'').toLowerCase().includes(q);
+    const matchS = subj === 'all' || r.subject === subj;
+    return matchQ && matchS;
+  }));
+}
+
+async function deleteWsResult(id) {
+  if (!confirm('Delete this worksheet result?')) return;
+  await db.collection('worksheetResults').doc(id).delete();
+  ALL_WS_RESULTS = ALL_WS_RESULTS.filter(r=>r.id!==id);
+  filterWsResults(); renderOverview();
 }
 
 // ════════════════════════════════════════════════════════
