@@ -167,14 +167,9 @@
     width: 100%; border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0,0,0,.12);
   }
-  .badge {
-    position: absolute; bottom: -20px; right: -20px;
-    background: var(--orange); color: #fff;
-    border-radius: 16px; padding: 18px 22px; text-align: center;
-    box-shadow: 0 8px 30px rgba(240,124,30,.4);
-  }
-  .badge-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; display: block; }
-  .badge-text { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+  
+  
+  
   .mission-points { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
   .mission-points li {
     display: flex; align-items: flex-start; gap: 14px;
@@ -313,7 +308,7 @@
   .footer-links a { color: rgba(255,255,255,.55); text-decoration: none; font-size: .88rem; transition: color .2s; }
   .footer-links a:hover { color: var(--orange); }
   .footer-bottom { text-align: center; font-size: .8rem; color: rgba(255,255,255,.3); max-width: 1200px; margin: 0 auto; }
-  .npo-badge { display: inline-block; background: rgba(45,106,143,.25); border: 1px solid rgba(45,106,143,.4); border-radius: 50px; padding: 4px 14px; font-size: .75rem; color: rgba(255,255,255,.5); margin-bottom: 8px; }
+  
 
   /* ── RESPONSIVE ── */
   @media(max-width: 900px) {
@@ -322,7 +317,7 @@
     .pricing-card { grid-template-columns: 1fr; padding: 40px 32px; }
     .nav-links, .nav-cta { display: none; }
     .hamburger { display: flex; }
-    .badge { bottom: 10px; right: 10px; }
+    
   }
 
   /* ── ANIMATIONS ── */
@@ -368,12 +363,7 @@
   .copy-btn:hover { background: #d96b0e; }
   @media(max-width:700px) { .donate-grid { grid-template-columns: 1fr; } }
 
-/* ── FOUNDERS / TEAM SECTION ───────────────────────────── */
-#team{padding:80px 5vw;background:#fff;}
 .team-head{text-align:center;margin-bottom:56px;}
-.team-head .section-label{margin-bottom:10px;}
-.team-head h2{font-family:"Playfair Display",serif;font-size:clamp(1.7rem,3.5vw,2.4rem);color:var(--navy);margin-bottom:12px;}
-.team-head p{color:var(--muted);font-size:.95rem;max-width:520px;margin:0 auto;line-height:1.7;}
 .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;}
 .team-card{text-align:center;position:relative;}
 .team-photo-wrap{position:relative;margin:0 auto 20px;width:200px;height:200px;}
@@ -384,7 +374,7 @@
 .team-role{display:inline-block;background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;padding:4px 16px;border-radius:50px;margin-bottom:14px;}
 .team-bio{font-size:.86rem;color:var(--muted);line-height:1.7;max-width:280px;margin:0 auto;}
 .team-divider{width:40px;height:3px;background:linear-gradient(90deg,var(--orange),var(--teal));border-radius:2px;margin:12px auto;}
-@media(max-width:640px){.team-grid{grid-template-columns:1fr;gap:40px;}.team-photo-wrap{width:170px;height:170px;}.team-photo{width:170px;height:170px;}}
+#team{padding:80px 5vw;background:#fff;}
 </style>
 </head>
 <body>
@@ -393,6 +383,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" onclick="closeMobile()">✕</button>
   <a href="#about" onclick="closeMobile()">About</a>
+        &nbsp;
         <a href="#team" onclick="closeMobile()">Our Team</a>
   <a href="#programmes" onclick="closeMobile()">Programmes</a>
   <a href="#schedule" onclick="closeMobile()">Schedule</a>
@@ -476,16 +467,13 @@
     <div class="about-img-wrap fade-up">
       <img src="flyer.png" alt="Mentor Me Tutor Advert"
            onerror="this.style.background='#e8f0f7'; this.style.height='360px'" />
-      <div class="badge">
-        <span class="badge-num">NPO</span>
-        <span class="badge-text">Registering</span>
-      </div>
+
     </div>
     <div class="fade-up">
       <div class="section-label">Who We Are</div>
       <h2>Building Brighter Futures, One Learner at a Time</h2>
       <p class="section-intro">
-        Mentor Me Tutor is a non-profit organisation (NPO Act, Act 71 of 1997) based at KwaZubumnandi Pre-School, V Section, Umlazi. We exist to close the academic gap for learners in Grades 4–12 who need extra support, delivering structured, interactive and affordable tutoring in Mathematics, English and isiZulu, with a strong emphasis on mentorship and building each learner's confidence for lifelong success.
+        Mentor Me Tutor is a non-profit organisation based at KwaZubumnandi Pre-School, V Section, Umlazi. We exist to close the academic gap for learners in Grades 4–12 who need extra support, delivering structured, interactive and affordable tutoring in Mathematics, English and isiZulu, with a strong emphasis on mentorship and building each learner's confidence for lifelong success.
       </p>
       <ul class="mission-points">
         <li>Focused on primary & secondary school education (Grades 4 to 12)</li>
@@ -499,17 +487,13 @@
   </div>
 </section>
 
-<!-- FOUNDERS / TEAM -->
 <section id="team">
   <div class="team-head fade-up">
     <div class="section-label">The People Behind MMT</div>
     <h2>Meet Our Founders</h2>
-    <p>Mentor Me Tutor was built by passionate individuals committed to transforming education in Umlazi and beyond.</p>
+    <p class="section-intro">Mentor Me Tutor was built by passionate individuals committed to transforming education in Umlazi and beyond.</p>
   </div>
-
   <div class="team-grid">
-
-    <!-- Chairperson -->
     <div class="team-card fade-up">
       <div class="team-photo-wrap">
         <img src="chairperson.png" alt="Chairperson" class="team-photo"/>
@@ -520,8 +504,6 @@
       <div class="team-divider"></div>
       <p class="team-bio">Visionary leader and co-founder of Mentor Me Tutor, driving the organisation's mission to empower learners across all grade levels.</p>
     </div>
-
-    <!-- Secretary -->
     <div class="team-card fade-up">
       <div class="team-photo-wrap">
         <img src="secretary.png" alt="Secretary" class="team-photo"/>
@@ -532,8 +514,6 @@
       <div class="team-divider"></div>
       <p class="team-bio">Dedicated co-founder who ensures the smooth operation and coordination of all MMT programmes and communications.</p>
     </div>
-
-    <!-- CFO -->
     <div class="team-card fade-up">
       <div class="team-photo-wrap">
         <img src="cfo.png" alt="Chief Financial Officer" class="team-photo"/>
@@ -544,7 +524,6 @@
       <div class="team-divider"></div>
       <p class="team-bio">Financial strategist and co-founder responsible for sustainable funding and resource management to keep MMT's services free for learners.</p>
     </div>
-
   </div>
 </section>
 
@@ -804,7 +783,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="npo-badge">NPO Registration In Progress · Act 71 of 1997</div>
+    
     <p>© 2025 Mentor Me Tutor Organisation. All rights reserved.</p>
   </div>
 </footer>
@@ -896,6 +875,5 @@
     status.style.display = 'block';
   }
 </script>
-
 </body>
 </html>
